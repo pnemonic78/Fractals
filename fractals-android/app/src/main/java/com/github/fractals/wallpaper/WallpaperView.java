@@ -9,7 +9,7 @@ import android.os.AsyncTask;
 
 import com.github.fractals.Charge;
 import com.github.fractals.FieldAsyncTask;
-import com.github.fields.electric.R;
+import com.github.fractals.R;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
