@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">الحقول الكهربائية</string>
+
+    <!-- Notifications. -->
+    <string name="finished">الانتهاء من التقديم.</string>
+
+    <!-- Saved. -->
+    <string name="menu_save_file">حفظ إلى ملف</string>
+    <string name="saving_text">إنقاذ صورة للملف…</string>
+    <string name="saved_title">يتم حفظ الحقول الكهربائية.</string>
+    <string name="saved_text">المس لعرض الحقول.</string>
+    <string name="save_failed">فشل في حفظ الصورة.</string>
+
+    <!-- Menu. -->
+    <string name="menu_fullscreen">تكبير الشاشة</string>
+    <string name="menu_random">عشوائية</string>
+</resources>

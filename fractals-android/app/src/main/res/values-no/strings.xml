@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Elektriske Feltene</string>
+
+    <!-- Notifications. -->
+    <string name="finished">Tegningen er ferdig.</string>
+
+    <!-- Saved. -->
+    <string name="menu_save_file">Lagre til fil</string>
+    <string name="saving_text">Lagrer bildet til fil…</string>
+    <string name="saved_title">Elektriske felt er lagret.</string>
+    <string name="saved_text">Trykk for å vise feltene.</string>
+    <string name="save_failed">Kunne ikke lagre bildet.</string>
+
+    <!-- Menu. -->
+    <string name="menu_fullscreen">Fullskjerm</string>
+    <string name="menu_random">Tilfeldig</string>
+</resources>

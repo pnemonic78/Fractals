@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">電場</string>
+
+    <!-- Notifications. -->
+    <string name="finished">図面は完成しました。</string>
+
+    <!-- Saved. -->
+    <string name="menu_save_file">ファイルに保存</string>
+    <string name="saving_text">画像をファイルに保存中…</string>
+    <string name="saved_title">電場が保存されます。</string>
+    <string name="saved_text">タッチしてフィールドを表示します。</string>
+    <string name="save_failed">画像を保存できませんでした。</string>
+
+    <!-- Menu. -->
+    <string name="menu_fullscreen">全画面表示</string>
+    <string name="menu_random">ランダム化</string>
+</resources>

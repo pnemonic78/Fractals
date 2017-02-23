@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">电场</string>
+
+    <!-- Notifications. -->
+    <string name="finished">绘画完成。</string>
+
+    <!-- Saved. -->
+    <string name="menu_save_file">保存到文件</string>
+    <string name="saving_text">正在将图片保存到文件…</string>
+    <string name="saved_title">电场得以节省。</string>
+    <string name="saved_text">触摸可查看字段。</string>
+    <string name="save_failed">无法保存图片。</string>
+
+    <!-- Menu. -->
+    <string name="menu_fullscreen">全屏</string>
+    <string name="menu_random">随机化</string>
+</resources>

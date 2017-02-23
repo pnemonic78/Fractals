@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Elektromos Mezők</string>
+
+    <!-- Notifications. -->
+    <string name="finished">Rajz befejeződött.</string>
+
+    <!-- Saved. -->
+    <string name="menu_save_file">Fájlba menteni</string>
+    <string name="saving_text">Kép mentése fájlba…</string>
+    <string name="saved_title">Elektromos mezők kerülnek.</string>
+    <string name="saved_text">Érintse meg az a mezőket.</string>
+    <string name="save_failed">Nem sikerült menteni a képet.</string>
+
+    <!-- Menu. -->
+    <string name="menu_fullscreen">Teljes képernyő</string>
+    <string name="menu_random">Véletlenszerű</string>
+</resources>

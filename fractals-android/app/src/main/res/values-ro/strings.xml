@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Câmpuri Electrice</string>
+
+    <!-- Notifications. -->
+    <string name="finished">Desenul este terminat.</string>
+
+    <!-- Saved. -->
+    <string name="menu_save_file">Salvați în fișier</string>
+    <string name="saving_text">Se salvează imaginea în fișier…</string>
+    <string name="saved_title">Câmpuri electrice sunt salvate.</string>
+    <string name="saved_text">Atingeți pentru a vizualiza câmpurile.</string>
+    <string name="save_failed">Pentru a salva imaginea a eșuat.</string>
+
+    <!-- Menu. -->
+    <string name="menu_fullscreen">Ecran complet</string>
+    <string name="menu_random">Randomizează</string>
+</resources>

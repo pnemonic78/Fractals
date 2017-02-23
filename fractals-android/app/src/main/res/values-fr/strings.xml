@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Champs Électriques</string>
+
+    <!-- Notifications. -->
+    <string name="finished">Le dessin est terminé.</string>
+
+    <!-- Saved. -->
+    <string name="menu_save_file">Enregistrer dans le fichier</string>
+    <string name="saving_text">Enregistrement d\'une image dans un fichier…</string>
+    <string name="saved_title">Les champs électriques sont enregistrés.</string>
+    <string name="saved_text">Touchez pour afficher vos champs.</string>
+    <string name="save_failed">Impossible d\'enregistrer l\'image.</string>
+
+    <!-- Menu. -->
+    <string name="menu_fullscreen">Plein écran</string>
+    <string name="menu_random">Randomiser</string>
+</resources>

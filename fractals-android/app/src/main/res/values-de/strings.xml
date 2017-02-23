@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Elektrische Felder</string>
+
+    <!-- Notifications. -->
+    <string name="finished">Zeichnung ist fertig.</string>
+
+    <!-- Saved. -->
+    <string name="menu_save_file">In Datei speichern</string>
+    <string name="saving_text">Bild wird gespeichert…</string>
+    <string name="saved_title">Elektrische Felder werden gespeichert.</string>
+    <string name="saved_text">Berühren Sie, um Ihre Felder anzuzeigen.</string>
+    <string name="save_failed">Fehler beim Speichern des Bildes.</string>
+
+    <!-- Menu. -->
+    <string name="menu_fullscreen">Vollbild</string>
+    <string name="menu_random">Randomisieren</string>
+</resources>

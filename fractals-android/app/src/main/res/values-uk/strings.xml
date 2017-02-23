@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Електричні Поля</string>
+
+    <!-- Notifications. -->
+    <string name="finished">Картина закінчена.</string>
+
+    <!-- Saved. -->
+    <string name="menu_save_file">Зберегти в файл</string>
+    <string name="saving_text">Збереження зображення в файл…</string>
+    <string name="saved_title">Електричні поля зберігаються.</string>
+    <string name="saved_text">Натисніть для перегляду полів.</string>
+    <string name="save_failed">Неможливо зберегти зображення.</string>
+
+    <!-- Menu. -->
+    <string name="menu_fullscreen">Повноекранний</string>
+    <string name="menu_random">Перемішати</string>
+</resources>

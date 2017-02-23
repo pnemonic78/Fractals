@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Elektriska Fält</string>
+
+    <!-- Notifications. -->
+    <string name="finished">Ritningen är färdig.</string>
+
+    <!-- Saved. -->
+    <string name="menu_save_file">Spara till fil</string>
+    <string name="saving_text">Spara bilden till fil…</string>
+    <string name="saved_title">Elektriska fält sparas.</string>
+    <string name="saved_text">Tryck här för att visa dina fält.</string>
+    <string name="save_failed">Det gick inte att spara bilden.</string>
+
+    <!-- Menu. -->
+    <string name="menu_fullscreen">Fullskärm</string>
+    <string name="menu_random">Slumpa</string>
+</resources>

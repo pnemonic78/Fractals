@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pola Elektryczne</string>
+
+    <!-- Notifications. -->
+    <string name="finished">Rysunek jest zakończona.</string>
+
+    <!-- Saved. -->
+    <string name="menu_save_file">Zapisz do pliku</string>
+    <string name="saving_text">Zapisywanie obrazu do pliku…</string>
+    <string name="saved_title">Pola elektryczne są zapisywane.</string>
+    <string name="saved_text">Dotknij, aby wyświetlić pol</string>
+    <string name="save_failed">Nie udało się zapisać obraz.</string>
+
+    <!-- Menu. -->
+    <string name="menu_fullscreen">Pełny ekran</string>
+    <string name="menu_random">Losowy</string>
+</resources>

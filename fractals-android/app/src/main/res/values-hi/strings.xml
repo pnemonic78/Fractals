@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">बिजली क्षेत्र</string>
+
+    <!-- Notifications. -->
+    <string name="finished">ड्राइंग समाप्त हो गया है।</string>
+
+    <!-- Saved. -->
+    <string name="menu_save_file">फाइल को बचाएं</string>
+    <string name="saving_text">दाखिल करने के लिए सेविंग छवि…</string>
+    <string name="saved_title">बिजली क्षेत्र से बच रहे हैं।</string>
+    <string name="saved_text">अपने खेतों देखने के लिए स्पर्श करें।</string>
+    <string name="save_failed">छवि को बचाने में विफल।</string>
+
+    <!-- Menu. -->
+    <string name="menu_fullscreen">पूर्ण स्क्रीन</string>
+    <string name="menu_random">अनियमित करें</string>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Elektriniai Laukai</string>
+
+    <!-- Notifications. -->
+    <string name="finished">Piešimo yra baigtas.</string>
+
+    <!-- Saved. -->
+    <string name="menu_save_file">Išsaugoti į failą</string>
+    <string name="saving_text">Taupymo vaizdą į failą…</string>
+    <string name="saved_title">Elektriniai laukai yra išsaugotas.</string>
+    <string name="saved_text">Palieskite, kad galėtumėte peržiūrėti savo laukus.</string>
+    <string name="save_failed">Nepavyko išsaugoti atvaizdą.</string>
+
+    <!-- Menu. -->
+    <string name="menu_fullscreen">Per visą ekraną</string>
+    <string name="menu_random">Atsitiktinė</string>
+</resources>

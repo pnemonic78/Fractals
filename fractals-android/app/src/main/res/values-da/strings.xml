@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Elektriske Felter</string>
+
+    <!-- Notifications. -->
+    <string name="finished">Tegning er færdig.</string>
+
+    <!-- Saved. -->
+    <string name="menu_save_file">Gem til fil</string>
+    <string name="saving_text">Gemme billede til fil…</string>
+    <string name="saved_title">Elektriske felter gemmes.</string>
+    <string name="saved_text">Tryk for at se dine felter.</string>
+    <string name="save_failed">Kunne ikke gemme billede.</string>
+
+    <!-- Menu. -->
+    <string name="menu_fullscreen">Fuld skærm</string>
+    <string name="menu_random">Tilfældig</string>
+</resources>

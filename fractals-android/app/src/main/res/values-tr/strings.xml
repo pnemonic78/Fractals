@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Elektrik Alanları</string>
+
+    <!-- Notifications. -->
+    <string name="finished">Çizim bitti.</string>
+
+    <!-- Saved. -->
+    <string name="menu_save_file">Dosyaya kaydet</string>
+    <string name="saving_text">Resim dosyaya kaydediliyor…</string>
+    <string name="saved_title">Elektrik alanları kaydedilir.</string>
+    <string name="saved_text">Alanlarınızı görüntülemek için dokunun.</string>
+    <string name="save_failed">Resim kaydedilemedi.</string>
+
+    <!-- Menu. -->
+    <string name="menu_fullscreen">Tam ekran</string>
+    <string name="menu_random">Rastgele seç</string>
+</resources>

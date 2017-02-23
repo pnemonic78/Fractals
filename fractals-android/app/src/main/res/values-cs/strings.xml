@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Elektrické Pole</string>
+
+    <!-- Notifications. -->
+    <string name="finished">Renderování je dokončen.</string>
+
+    <!-- Saved. -->
+    <string name="menu_save_file">Uložit do souboru</string>
+    <string name="saving_text">Uložení obrazu do souboru…</string>
+    <string name="saved_title">Elektrická pole jsou uloženy.</string>
+    <string name="saved_text">Dotykem zobrazit pole.</string>
+    <string name="save_failed">Nepodařilo se uložit obrázek.</string>
+
+    <!-- Menu. -->
+    <string name="menu_fullscreen">Celá obrazovka</string>
+    <string name="menu_random">Náhodně</string>
+</resources>

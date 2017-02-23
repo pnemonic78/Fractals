@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Campi Elettrici</string>
+
+    <!-- Notifications. -->
+    <string name="finished">Disegno è finito.</string>
+
+    <!-- Saved. -->
+    <string name="menu_save_file">Salva su file</string>
+    <string name="saving_text">Salvataggio di immagini in un file…</string>
+    <string name="saved_title">I campi elettrici vengono salvati.</string>
+    <string name="saved_text">Toccare per visualizzare i campi.</string>
+    <string name="save_failed">Impossibile salvare l\'immagine.</string>
+
+    <!-- Menu. -->
+    <string name="menu_fullscreen">A schermo intero</string>
+    <string name="menu_random">Randomizza</string>
+</resources>
