@@ -9,7 +9,7 @@
  *
  * Contributors can be contacted by electronic mail via the project Web pages:
  *
- * https://github.com/pnemonic78/Electric-Fields
+ * https://github.com/pnemonic78/Fractals
  *
  * Contributor(s):
  *   Moshe Waisberg
@@ -18,7 +18,7 @@
 package com.github.fractals;
 
 /**
- * Electric fields event listener.
+ * Fractals event listener.
  *
  * @author Moshe Waisberg
  */

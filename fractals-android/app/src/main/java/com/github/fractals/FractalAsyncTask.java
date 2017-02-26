@@ -9,7 +9,7 @@
  *
  * Contributors can be contacted by electronic mail via the project Web pages:
  *
- * https://github.com/pnemonic78/Electric-Fields
+ * https://github.com/pnemonic78/Fractals
  *
  * Contributor(s):
  *   Moshe Waisberg
@@ -24,7 +24,9 @@ import android.graphics.RectF;
 import android.os.AsyncTask;
 
 /**
- * Electric Fields task.
+ * Fractals task.
+ * <br>
+ * {@code Z := Z * Z + K}
  *
  * @author Moshe Waisberg
  */

@@ -9,7 +9,7 @@
  *
  * Contributors can be contacted by electronic mail via the project Web pages:
  *
- * https://github.com/pnemonic78/Electric-Fields
+ * https://github.com/pnemonic78/Fractals
  *
  * Contributor(s):
  *   Moshe Waisberg
@@ -34,7 +34,7 @@ import java.util.Random;
 /**
  * Electric Fields wallpaper service.
  *
- * @author moshe.w
+ * @author Moshe Waisberg
  */
 public class FractalsWallpaperService extends WallpaperService {
 

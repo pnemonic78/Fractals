@@ -9,7 +9,7 @@
  *
  * Contributors can be contacted by electronic mail via the project Web pages:
  *
- * https://github.com/pnemonic78/Electric-Fields
+ * https://github.com/pnemonic78/Fractals
  *
  * Contributor(s):
  *   Moshe Waisberg
@@ -22,7 +22,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Electric charge particle.
+ * Fractals particle.
  *
  * @author Moshe Waisberg
  */
