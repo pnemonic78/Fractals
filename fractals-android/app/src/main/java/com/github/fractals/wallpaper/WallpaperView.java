@@ -8,23 +8,23 @@ import android.graphics.Matrix;
 import android.os.AsyncTask;
 
 import com.github.fractals.Charge;
-import com.github.fractals.FieldAsyncTask;
+import com.github.fractals.FractalAsyncTask;
 import com.github.fractals.R;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static com.github.fractals.ElectricFieldsView.MAX_CHARGES;
+import static com.github.fractals.FractalsView.MAX_CHARGES;
 
 /**
  * Created by Moshe on 2017/02/15.
  */
-public class WallpaperView implements FieldAsyncTask.FieldAsyncTaskListener {
+public class WallpaperView implements FractalAsyncTask.FieldAsyncTaskListener {
 
     private int width, height;
     private final List<Charge> charges = new CopyOnWriteArrayList<>();
     private Bitmap bitmap;
-    private FieldAsyncTask task;
+    private FractalAsyncTask task;
     private int sameChargeDistance;
     private WallpaperListener listener;
 
@@ -110,7 +110,7 @@ public class WallpaperView implements FieldAsyncTask.FieldAsyncTaskListener {
      */
     public void start(long delay) {
         if (!isRendering()) {
-            task = new FieldAsyncTask(this, new Canvas(bitmap));
+            task = new FractalAsyncTask(this, new Canvas(bitmap));
             task.setSaturation(0.5f);
             task.setBrightness(0.5f);
             task.setStartDelay(delay);
@@ -154,14 +154,14 @@ public class WallpaperView implements FieldAsyncTask.FieldAsyncTaskListener {
     }
 
     @Override
-    public void onTaskStarted(FieldAsyncTask task) {
+    public void onTaskStarted(FractalAsyncTask task) {
         if (listener != null) {
             listener.onRenderFieldStarted(this);
         }
     }
 
     @Override
-    public void onTaskFinished(FieldAsyncTask task) {
+    public void onTaskFinished(FractalAsyncTask task) {
         if (task == this.task) {
             if (listener != null) {
                 invalidate();
@@ -172,14 +172,14 @@ public class WallpaperView implements FieldAsyncTask.FieldAsyncTaskListener {
     }
 
     @Override
-    public void onTaskCancelled(FieldAsyncTask task) {
+    public void onTaskCancelled(FractalAsyncTask task) {
         if (listener != null) {
             listener.onRenderFieldCancelled(this);
         }
     }
 
     @Override
-    public void repaint(FieldAsyncTask task) {
+    public void repaint(FractalAsyncTask task) {
         invalidate();
     }
 

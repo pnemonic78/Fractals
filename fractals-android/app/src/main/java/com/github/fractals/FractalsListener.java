@@ -22,15 +22,15 @@ package com.github.fractals;
  *
  * @author Moshe Waisberg
  */
-public interface ElectricFieldsListener {
+public interface FractalsListener {
 
-    void onChargeAdded(ElectricFieldsView view, Charge charge);
+    void onChargeAdded(FractalsView view, Charge charge);
 
-    void onChargeInverted(ElectricFieldsView view, Charge charge);
+    void onChargeInverted(FractalsView view, Charge charge);
 
-    void onRenderFieldStarted(ElectricFieldsView view);
+    void onRenderFieldStarted(FractalsView view);
 
-    void onRenderFieldFinished(ElectricFieldsView view);
+    void onRenderFieldFinished(FractalsView view);
 
-    void onRenderFieldCancelled(ElectricFieldsView view);
+    void onRenderFieldCancelled(FractalsView view);
 }

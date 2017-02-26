@@ -28,7 +28,7 @@ import android.os.AsyncTask;
  *
  * @author Moshe Waisberg
  */
-public class FieldAsyncTask extends AsyncTask<Charge, Canvas, Canvas> {
+public class FractalAsyncTask extends AsyncTask<Charge, Canvas, Canvas> {
 
     public interface FieldAsyncTaskListener {
         /**
@@ -36,28 +36,28 @@ public class FieldAsyncTask extends AsyncTask<Charge, Canvas, Canvas> {
          *
          * @param task the caller task.
          */
-        void onTaskStarted(FieldAsyncTask task);
+        void onTaskStarted(FractalAsyncTask task);
 
         /**
          * Notify the listener that the task has finished.
          *
          * @param task the caller task.
          */
-        void onTaskFinished(FieldAsyncTask task);
+        void onTaskFinished(FractalAsyncTask task);
 
         /**
          * Notify the listener that the task has aborted.
          *
          * @param task the caller task.
          */
-        void onTaskCancelled(FieldAsyncTask task);
+        void onTaskCancelled(FractalAsyncTask task);
 
         /**
          * Notify the listener to repaint its bitmap.
          *
          * @param task the caller task.
          */
-        void repaint(FieldAsyncTask task);
+        void repaint(FractalAsyncTask task);
     }
 
     private final FieldAsyncTaskListener listener;
@@ -67,7 +67,7 @@ public class FieldAsyncTask extends AsyncTask<Charge, Canvas, Canvas> {
     private final float[] hsv = {0f, 1f, 1f};
     private long startDelay = 0L;
 
-    public FieldAsyncTask(FieldAsyncTaskListener listener, Canvas canvas) {
+    public FractalAsyncTask(FieldAsyncTaskListener listener, Canvas canvas) {
         this.listener = listener;
         this.canvas = canvas;
     }

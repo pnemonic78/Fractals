@@ -38,27 +38,27 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  * @author Moshe Waisberg
  */
-public class ElectricFieldsView extends View implements FieldAsyncTask.FieldAsyncTaskListener {
+public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTaskListener {
 
     public static final int MAX_CHARGES = 10;
 
     private final List<Charge> charges = new CopyOnWriteArrayList<>();
     private Bitmap bitmap;
-    private FieldAsyncTask task;
+    private FractalAsyncTask task;
     private int sameChargeDistance;
-    private ElectricFieldsListener listener;
+    private FractalsListener listener;
 
-    public ElectricFieldsView(Context context) {
+    public FractalsView(Context context) {
         super(context);
         init(context);
     }
 
-    public ElectricFieldsView(Context context, AttributeSet attrs) {
+    public FractalsView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public ElectricFieldsView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public FractalsView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
@@ -133,7 +133,7 @@ public class ElectricFieldsView extends View implements FieldAsyncTask.FieldAsyn
      */
     public void start() {
         if (!isRendering()) {
-            task = new FieldAsyncTask(this, new Canvas(getBitmap()));
+            task = new FractalAsyncTask(this, new Canvas(getBitmap()));
             task.execute(charges.toArray(new Charge[charges.size()]));
         }
     }
@@ -156,14 +156,14 @@ public class ElectricFieldsView extends View implements FieldAsyncTask.FieldAsyn
     }
 
     @Override
-    public void onTaskStarted(FieldAsyncTask task) {
+    public void onTaskStarted(FractalAsyncTask task) {
         if (listener != null) {
             listener.onRenderFieldStarted(this);
         }
     }
 
     @Override
-    public void onTaskFinished(FieldAsyncTask task) {
+    public void onTaskFinished(FractalAsyncTask task) {
         if (task == this.task) {
             invalidate();
             if (listener != null) {
@@ -174,14 +174,14 @@ public class ElectricFieldsView extends View implements FieldAsyncTask.FieldAsyn
     }
 
     @Override
-    public void onTaskCancelled(FieldAsyncTask task) {
+    public void onTaskCancelled(FractalAsyncTask task) {
         if (listener != null) {
             listener.onRenderFieldCancelled(this);
         }
     }
 
     @Override
-    public void repaint(FieldAsyncTask task) {
+    public void repaint(FractalAsyncTask task) {
         postInvalidate();
     }
 
@@ -222,7 +222,7 @@ public class ElectricFieldsView extends View implements FieldAsyncTask.FieldAsyn
      *
      * @param listener the listener.
      */
-    public void setElectricFieldsListener(ElectricFieldsListener listener) {
+    public void setElectricFieldsListener(FractalsListener listener) {
         this.listener = listener;
     }
 

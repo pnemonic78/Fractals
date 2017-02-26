@@ -48,13 +48,13 @@ public class MainActivity extends Activity implements
         GestureDetector.OnGestureListener,
         GestureDetector.OnDoubleTapListener,
         ScaleGestureDetector.OnScaleGestureListener,
-        ElectricFieldsListener {
+        FractalsListener {
 
     private static final String TAG = "MainActivity";
 
     private static final int REQUEST_SAVE = 1;
 
-    private ElectricFieldsView fieldsView;
+    private FractalsView fieldsView;
     private GestureDetector gestureDetector;
     private ScaleGestureDetector scaleGestureDetector;
     private AsyncTask saveTask;
@@ -67,7 +67,7 @@ public class MainActivity extends Activity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        fieldsView = (ElectricFieldsView) findViewById(R.id.electric_fields);
+        fieldsView = (FractalsView) findViewById(R.id.fractals);
         fieldsView.setOnTouchListener(this);
         fieldsView.setElectricFieldsListener(this);
 
@@ -211,7 +211,7 @@ public class MainActivity extends Activity implements
     private void randomise() {
         int w = fieldsView.getMeasuredWidth();
         int h = fieldsView.getMeasuredHeight();
-        int count = 1 + random.nextInt(ElectricFieldsView.MAX_CHARGES);
+        int count = 1 + random.nextInt(FractalsView.MAX_CHARGES);
         fieldsView.clear();
         for (int i = 0; i < count; i++) {
             fieldsView.addCharge(random.nextInt(w), random.nextInt(h), (random.nextBoolean() ? +1 : -1) * (1 + (random.nextDouble() * 20)));
@@ -239,15 +239,15 @@ public class MainActivity extends Activity implements
     }
 
     @Override
-    public void onChargeAdded(ElectricFieldsView view, Charge charge) {
+    public void onChargeAdded(FractalsView view, Charge charge) {
     }
 
     @Override
-    public void onChargeInverted(ElectricFieldsView view, Charge charge) {
+    public void onChargeInverted(FractalsView view, Charge charge) {
     }
 
     @Override
-    public void onRenderFieldStarted(ElectricFieldsView view) {
+    public void onRenderFieldStarted(FractalsView view) {
         if (view == fieldsView) {
             if (menuStop != null) {
                 menuStop.setEnabled(view.isRendering());
@@ -256,7 +256,7 @@ public class MainActivity extends Activity implements
     }
 
     @Override
-    public void onRenderFieldFinished(ElectricFieldsView view) {
+    public void onRenderFieldFinished(FractalsView view) {
         if (view == fieldsView) {
             if (menuStop != null) {
                 menuStop.setEnabled(view.isRendering());
@@ -266,7 +266,7 @@ public class MainActivity extends Activity implements
     }
 
     @Override
-    public void onRenderFieldCancelled(ElectricFieldsView view) {
+    public void onRenderFieldCancelled(FractalsView view) {
         if (view == fieldsView) {
             if (menuStop != null) {
                 menuStop.setEnabled(view.isRendering());

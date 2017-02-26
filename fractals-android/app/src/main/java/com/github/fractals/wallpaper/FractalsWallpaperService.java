@@ -27,7 +27,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 import com.github.fractals.Charge;
-import com.github.fractals.ElectricFieldsView;
+import com.github.fractals.FractalsView;
 
 import java.util.Random;
 
@@ -36,7 +36,7 @@ import java.util.Random;
  *
  * @author moshe.w
  */
-public class ElectricFieldsWallpaperService extends WallpaperService {
+public class FractalsWallpaperService extends WallpaperService {
 
     @Override
     public Engine onCreateEngine() {
@@ -68,7 +68,7 @@ public class ElectricFieldsWallpaperService extends WallpaperService {
             super.onCreate(surfaceHolder);
             setTouchEventsEnabled(true);
 
-            Context context = ElectricFieldsWallpaperService.this;
+            Context context = FractalsWallpaperService.this;
             fieldsView = new WallpaperView(context, this);
 
             gestureDetector = new GestureDetector(context, this);
@@ -125,7 +125,7 @@ public class ElectricFieldsWallpaperService extends WallpaperService {
         private void randomise(long delay) {
             int w = fieldsView.getWidth();
             int h = fieldsView.getHeight();
-            int count = 1 + random.nextInt(ElectricFieldsView.MAX_CHARGES);
+            int count = 1 + random.nextInt(FractalsView.MAX_CHARGES);
             fieldsView.clear();
             for (int i = 0; i < count; i++) {
                 fieldsView.addCharge(random.nextInt(w), random.nextInt(h), (random.nextBoolean() ? +1 : -1) * (1 + (random.nextDouble() * 20)));
