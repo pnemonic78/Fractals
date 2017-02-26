@@ -22,34 +22,17 @@ package com.github.fractals;
  *
  * @author Moshe Waisberg
  */
-public class Complex extends Number {
+public class Complex {
 
-    private final double real;
-    private final double imaginary;
+    private double real;
+    private double imaginary;
+
+    public Complex() {
+    }
 
     public Complex(double real, double imaginary) {
         this.real = real;
         this.imaginary = imaginary;
-    }
-
-    @Override
-    public int intValue() {
-        return (int) real;
-    }
-
-    @Override
-    public long longValue() {
-        return (long) real;
-    }
-
-    @Override
-    public float floatValue() {
-        return (float) real;
-    }
-
-    @Override
-    public double doubleValue() {
-        return real;
     }
 
     public double getReal() {
@@ -58,5 +41,10 @@ public class Complex extends Number {
 
     public double getImaginary() {
         return imaginary;
+    }
+
+    public void set(double real, double imaginary) {
+        this.real = real;
+        this.imaginary = imaginary;
     }
 }

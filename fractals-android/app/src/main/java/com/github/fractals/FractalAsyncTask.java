@@ -25,8 +25,6 @@ import android.os.AsyncTask;
 
 /**
  * Fractals task.
- * <br>
- * {@code Z := Z * Z + K}
  *
  * @author Moshe Waisberg
  */
@@ -68,6 +66,9 @@ public class FractalAsyncTask extends AsyncTask<Charge, Canvas, Canvas> {
     private final RectF rect = new RectF();
     private final float[] hsv = {0f, 1f, 1f};
     private long startDelay = 0L;
+    private double warp = 2;
+    private double zoom = 1e+3;
+    private final Complex pan = new Complex(0, 0);
 
     public FractalAsyncTask(FieldAsyncTaskListener listener, Canvas canvas) {
         this.listener = listener;
@@ -103,14 +104,14 @@ public class FractalAsyncTask extends AsyncTask<Charge, Canvas, Canvas> {
             size >>>= 1;
             shifts++;
         }
-        double density = 1e+3;
+        double density = zoom;
 
         // Make "resolution2" a power of 2, so that "resolution" is always divisible by 2.
         int resolution2 = 1 << shifts;
         int resolution = resolution2;
 
         canvas.drawColor(Color.WHITE);
-        plot(charges, canvas, 0, 0, resolution, resolution, density);
+        plotMandelbrot(canvas, 0, 0, resolution, resolution, density);
 
         int x1, y1, x2, y2;
 
@@ -123,9 +124,9 @@ public class FractalAsyncTask extends AsyncTask<Charge, Canvas, Canvas> {
                 x2 = resolution;
 
                 while (x1 < w) {
-                    plot(charges, canvas, x1, y2, resolution, resolution, density);
-                    plot(charges, canvas, x2, y1, resolution, resolution, density);
-                    plot(charges, canvas, x2, y2, resolution, resolution, density);
+                    plotMandelbrot(canvas, x1, y2, resolution, resolution, density);
+                    plotMandelbrot(canvas, x2, y1, resolution, resolution, density);
+                    plotMandelbrot(canvas, x2, y2, resolution, resolution, density);
 
                     x1 += resolution2;
                     x2 += resolution2;
@@ -170,28 +171,31 @@ public class FractalAsyncTask extends AsyncTask<Charge, Canvas, Canvas> {
         listener.onTaskCancelled(this);
     }
 
-    private void plot(ChargeHolder[] charges, Canvas canvas, int x, int y, int w, int h, double zoom) {
-        int dx, dy, d;
-        double r;
-        double v = 1;
-        final int count = charges.length;
-        ChargeHolder charge;
+    /**
+     * Plot a Mandelbrot point.
+     * <br>
+     * {@code Z := Z * Z + K}
+     */
+    private void plotMandelbrot(Canvas canvas, int x, int y, int w, int h, double density) {
+        double zRe = (x / zoom) + pan.getReal();
+        double zIm = (y / zoom) + pan.getImaginary();
+        double zReAbs, zImAbs;
+        double kRe = zRe;
+        double kIm = zIm;
+        final double kReAbs = Math.abs(kRe);
+        final double kImAbs = Math.abs(kIm);
 
-        for (int i = 0; i < count; i++) {
-            charge = charges[i];
-            dx = x - charge.x;
-            dy = y - charge.y;
-            d = (dx * dx) + (dy * dy);
-            r = Math.sqrt(d);
-            if (r == 0) {
-                //Force "overflow".
-                v = Double.POSITIVE_INFINITY;
-                break;
-            }
-            v += charge.size / r;
+        int i = 0;
+        do {
+            zRe = (zRe * zRe) - (zIm * zIm) + kRe;
+            zIm = (warp * zRe * zIm) + kIm;
+            zReAbs = Math.abs(zRe);
+            zImAbs = Math.abs(zIm);
+            i++;
         }
+        while ((zReAbs <= w) && (zImAbs <= h) && (i <= 1000) && ((zReAbs != kReAbs) || (zImAbs != kImAbs)));
 
-        paint.setColor(mapColor(v, zoom));
+        paint.setColor(mapColor(i, density));
         rect.set(x, y, x + w, y + h);
         canvas.drawRect(rect, paint);
     }
