@@ -66,8 +66,7 @@ public class FractalAsyncTask extends AsyncTask<Charge, Canvas, Canvas> {
     private final RectF rect = new RectF();
     private final float[] hsv = {0f, 1f, 1f};
     private long startDelay = 0L;
-    private double warp = 2;
-    private double zoom = 1e+3;
+    private double zoom = 1;
     private final Complex pan = new Complex(0, 0);
 
     public FractalAsyncTask(FieldAsyncTaskListener listener, Canvas canvas) {
@@ -94,7 +93,6 @@ public class FractalAsyncTask extends AsyncTask<Charge, Canvas, Canvas> {
             // Ignore.
         }
 
-        final ChargeHolder[] charges = ChargeHolder.toChargedParticles(params);
         int w = canvas.getWidth();
         int h = canvas.getHeight();
         int size = Math.max(w, h);
@@ -109,9 +107,11 @@ public class FractalAsyncTask extends AsyncTask<Charge, Canvas, Canvas> {
         // Make "resolution2" a power of 2, so that "resolution" is always divisible by 2.
         int resolution2 = 1 << shifts;
         int resolution = resolution2;
+        int sw = resolution / 2;
+        int sh = sw;
 
         canvas.drawColor(Color.WHITE);
-        plotMandelbrot(canvas, 0, 0, resolution, resolution, density);
+        plotMandelbrot(canvas, 0, 0, resolution, resolution, sw, sh, density);
 
         int x1, y1, x2, y2;
 
@@ -124,9 +124,9 @@ public class FractalAsyncTask extends AsyncTask<Charge, Canvas, Canvas> {
                 x2 = resolution;
 
                 while (x1 < w) {
-                    plotMandelbrot(canvas, x1, y2, resolution, resolution, density);
-                    plotMandelbrot(canvas, x2, y1, resolution, resolution, density);
-                    plotMandelbrot(canvas, x2, y2, resolution, resolution, density);
+                    plotMandelbrot(canvas, x1, y2, resolution, resolution, sw, sh, density);
+                    plotMandelbrot(canvas, x2, y1, resolution, resolution, sw, sh, density);
+                    plotMandelbrot(canvas, x2, y2, resolution, resolution, sw, sh, density);
 
                     x1 += resolution2;
                     x2 += resolution2;
@@ -174,26 +174,37 @@ public class FractalAsyncTask extends AsyncTask<Charge, Canvas, Canvas> {
     /**
      * Plot a Mandelbrot point.
      * <br>
-     * {@code Z := Z * Z + K}
+     * {@code z := z * z + c}
+     * <br>
+     * http://en.wikipedia.org/wiki/Mandelbrot_set
      */
-    private void plotMandelbrot(Canvas canvas, int x, int y, int w, int h, double density) {
-        double zRe = (x / zoom) + pan.getReal();
-        double zIm = (y / zoom) + pan.getImaginary();
-        double zReAbs, zImAbs;
-        double kRe = zRe;
-        double kIm = zIm;
-        final double kReAbs = Math.abs(kRe);
-        final double kImAbs = Math.abs(kIm);
-
+    private void plotMandelbrot(Canvas canvas, int x, int y, int w, int h, int sw, int sh, double density) {
+        // scaled x coordinate of pixel (scaled to lie in the Mandelbrot X scale (-2.5, 1))
+        double kRe = (((double) x - sw) / sw) / zoom + pan.getReal();
+        // scaled y coordinate of pixel (scaled to lie in the Mandelbrot Y scale (-1, 1))
+        double kIm = (((double) y - sh) / sh) / zoom + pan.getImaginary();
+        double zRe = 0;
+        double zIm = 0;
+//        double zReAbs = 0;
+//        double zImAbs = 0;
+        double zReSrq = 0;
+        double zImSrq = 0;
+//        final double kReAbs = Math.abs(kRe);
+//        final double kImAbs = Math.abs(kIm);
+        double r;
         int i = 0;
+
+        //while ((zReAbs <= w) && (zImAbs <= h) && (i <= 1000) /*&& ((zReAbs != kReAbs) || (zImAbs != kImAbs))*/) {
         do {
-            zRe = (zRe * zRe) - (zIm * zIm) + kRe;
-            zIm = (warp * zRe * zIm) + kIm;
-            zReAbs = Math.abs(zRe);
-            zImAbs = Math.abs(zIm);
+            r = zReSrq - zImSrq + kRe;
+            zIm = (2 * zRe * zIm) + kIm;
+            zRe = r;
+            zReSrq = zRe * zRe;
+            zImSrq = zIm * zIm;
+//            zReAbs = Math.abs(zRe);
+//            zImAbs = Math.abs(zIm);
             i++;
-        }
-        while ((zReAbs <= w) && (zImAbs <= h) && (i <= 1000) && ((zReAbs != kReAbs) || (zImAbs != kImAbs)));
+        } while ((i <= 1000) && ((zReSrq + zImSrq) < 4));
 
         paint.setColor(mapColor(i, density));
         rect.set(x, y, x + w, y + h);
@@ -202,7 +213,7 @@ public class FractalAsyncTask extends AsyncTask<Charge, Canvas, Canvas> {
 
     private int mapColor(double z, double density) {
         if (Double.isInfinite(z)) {
-            return Color.WHITE;
+            return Color.BLACK;
         }
         hsv[0] = (float) ((z * density) % 360);
         return Color.HSVToColor(hsv);
@@ -233,34 +244,5 @@ public class FractalAsyncTask extends AsyncTask<Charge, Canvas, Canvas> {
      */
     public void setStartDelay(long delay) {
         startDelay = delay;
-    }
-
-    private static class ChargeHolder {
-        public final int x;
-        public final int y;
-        public final double size;
-        public final double sizeSqr;
-
-        public ChargeHolder(Charge charge) {
-            this(charge.x, charge.y, charge.size);
-        }
-
-        public ChargeHolder(int x, int y, double size) {
-            this.x = x;
-            this.y = y;
-            this.size = size;
-            this.sizeSqr = Math.signum(size) * size * size;
-        }
-
-        public static ChargeHolder[] toChargedParticles(Charge[] charges) {
-            final int length = charges.length;
-            ChargeHolder[] result = new ChargeHolder[length];
-
-            for (int i = 0; i < length; i++) {
-                result[i] = new ChargeHolder(charges[i]);
-            }
-
-            return result;
-        }
     }
 }
