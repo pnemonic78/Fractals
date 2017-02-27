@@ -32,7 +32,7 @@ import com.github.fractals.FractalsView;
 import java.util.Random;
 
 /**
- * Electric Fields wallpaper service.
+ * Fractals wallpaper service.
  *
  * @author Moshe Waisberg
  */
@@ -40,15 +40,15 @@ public class FractalsWallpaperService extends WallpaperService {
 
     @Override
     public Engine onCreateEngine() {
-        return new ElectricFieldsWallpaperEngine();
+        return new FractalsWallpaperEngine();
     }
 
     /**
-     * Electric Fields wallpaper engine.
+     * Fractals wallpaper engine.
      *
      * @author moshe.w
      */
-    protected class ElectricFieldsWallpaperEngine extends Engine implements
+    protected class FractalsWallpaperEngine extends Engine implements
             GestureDetector.OnGestureListener,
             GestureDetector.OnDoubleTapListener,
             WallpaperListener {
