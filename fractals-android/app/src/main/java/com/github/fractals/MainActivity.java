@@ -194,29 +194,12 @@ public class MainActivity extends Activity implements
                     hideFullscreen();
                 }
                 return true;
-            case R.id.menu_random:
-                randomise();
-                return true;
             case R.id.menu_save_file:
                 saveToFile();
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Add random charges.
-     */
-    private void randomise() {
-        int w = fieldsView.getMeasuredWidth();
-        int h = fieldsView.getMeasuredHeight();
-        int count = 1 + random.nextInt(FractalsView.MAX_CHARGES);
-        fieldsView.clear();
-        for (int i = 0; i < count; i++) {
-            fieldsView.addCharge(random.nextInt(w), random.nextInt(h), (random.nextBoolean() ? +1 : -1) * (1 + (random.nextDouble() * 20)));
-        }
-        fieldsView.restart();
     }
 
     /**
@@ -351,5 +334,15 @@ public class MainActivity extends Activity implements
         if (saveTask != null) {
             saveTask.cancel(true);
         }
+    }
+
+    private void start() {
+        fieldsView.start();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        start();
     }
 }

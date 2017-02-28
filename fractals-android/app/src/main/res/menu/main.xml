@@ -7,11 +7,6 @@
         android:showAsAction="always"
         android:title="@string/menu_fullscreen"/>
     <item
-        android:id="@+id/menu_random"
-        android:icon="@drawable/ic_menu_random"
-        android:showAsAction="always"
-        android:title="@string/menu_random"/>
-    <item
         android:id="@+id/menu_stop"
         android:enabled="false"
         android:icon="@drawable/ic_menu_stop"
