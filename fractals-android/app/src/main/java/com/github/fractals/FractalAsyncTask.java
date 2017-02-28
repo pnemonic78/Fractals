@@ -105,7 +105,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
             size >>>= 1;
             shifts++;
         }
-        double density = zoom;
+        double density = 1e+1;
 
         // Make "resolution2" a power of 2, so that "resolution" is always divisible by 2.
         int resolution2 = 1 << shifts;
@@ -196,18 +196,18 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
             zReSrq = zRe * zRe;
             zImSrq = zIm * zIm;
             i++;
-        } while ((i <= 1000) && ((zReSrq + zImSrq) < 8));
+        } while ((i <= 1000) && ((zReSrq + zImSrq) < 9));
 
         paint.setColor(mapColor(i, density));
         rect.set(x, y, x + w, y + h);
         canvas.drawRect(rect, paint);
     }
 
-    private int mapColor(double z, double density) {
-        if (Double.isInfinite(z)) {
+    private int mapColor(double c, double density) {
+        if (c == 0) {
             return Color.BLACK;
         }
-        hsv[0] = (float) ((z * density) % 360);
+        hsv[0] = (float) ((c * density) % 360);
         return Color.HSVToColor(hsv);
     }
 
