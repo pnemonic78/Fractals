@@ -67,7 +67,8 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
     private final float[] hsv = {0f, 1f, 1f};
     private long startDelay = 0L;
     private double zoom = 1;
-    private final Complex pan = new Complex(0, 0);
+    private int panX = 0;
+    private int panY = 0;
 
     public FractalAsyncTask(FieldAsyncTaskListener listener, Canvas canvas) {
         this.listener = listener;
@@ -96,6 +97,8 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         int w = canvas.getWidth();
         int h = canvas.getHeight();
         int size = Math.max(w, h);
+        int sw = Math.min(w, h);
+        int sh = sw;
 
         int shifts = 0;
         while (size > 1) {
@@ -107,8 +110,6 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         // Make "resolution2" a power of 2, so that "resolution" is always divisible by 2.
         int resolution2 = 1 << shifts;
         int resolution = resolution2;
-        int sw = resolution / 2;
-        int sh = sw;
 
         canvas.drawColor(Color.WHITE);
         plotMandelbrot(canvas, 0, 0, resolution, resolution, sw, sh, density);
@@ -179,32 +180,23 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
      * http://en.wikipedia.org/wiki/Mandelbrot_set
      */
     private void plotMandelbrot(Canvas canvas, int x, int y, int w, int h, int sw, int sh, double density) {
-        // scaled x coordinate of pixel (scaled to lie in the Mandelbrot X scale (-2.5, 1))
-        double kRe = (((double) x - sw) / sw) / zoom + pan.getReal();
-        // scaled y coordinate of pixel (scaled to lie in the Mandelbrot Y scale (-1, 1))
-        double kIm = (((double) y - sh) / sh) / zoom + pan.getImaginary();
+        double kRe = (((x + panX) / zoom / (sw / 3.5)) - 2.5);
+        double kIm = (((y + panY) / zoom / (sh / 3.5)) - 2.5);
         double zRe = 0;
         double zIm = 0;
-//        double zReAbs = 0;
-//        double zImAbs = 0;
         double zReSrq = 0;
         double zImSrq = 0;
-//        final double kReAbs = Math.abs(kRe);
-//        final double kImAbs = Math.abs(kIm);
         double r;
         int i = 0;
 
-        //while ((zReAbs <= w) && (zImAbs <= h) && (i <= 1000) /*&& ((zReAbs != kReAbs) || (zImAbs != kImAbs))*/) {
         do {
             r = zReSrq - zImSrq + kRe;
             zIm = (2 * zRe * zIm) + kIm;
             zRe = r;
             zReSrq = zRe * zRe;
             zImSrq = zIm * zIm;
-//            zReAbs = Math.abs(zRe);
-//            zImAbs = Math.abs(zIm);
             i++;
-        } while ((i <= 1000) && ((zReSrq + zImSrq) < 4));
+        } while ((i <= 1000) && ((zReSrq + zImSrq) < 8));
 
         paint.setColor(mapColor(i, density));
         rect.set(x, y, x + w, y + h);
