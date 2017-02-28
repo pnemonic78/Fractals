@@ -36,8 +36,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import java.util.Random;
-
 /**
  * Main activity.
  *
@@ -58,9 +56,7 @@ public class MainActivity extends Activity implements
     private GestureDetector gestureDetector;
     private ScaleGestureDetector scaleGestureDetector;
     private AsyncTask saveTask;
-    private Charge chargeToScale;
     private float scaleFactor = 1f;
-    private final Random random = new Random();
     private MenuItem menuStop;
 
     @Override
@@ -131,45 +127,30 @@ public class MainActivity extends Activity implements
 
     @Override
     public boolean onSingleTapConfirmed(MotionEvent e) {
-        fieldClicked(e);
-        return true;
+        return false;
     }
 
     @Override
     public boolean onScaleBegin(ScaleGestureDetector detector) {
         scaleFactor = 1f;
-        float x = detector.getFocusX();
-        float y = detector.getFocusY();
-        chargeToScale = fieldsView.findCharge((int) x, (int) y);
-        return chargeToScale != null;
+//        float x = detector.getFocusX();
+//        float y = detector.getFocusY();
+//        chargeToScale = fieldsView.findCharge((int) x, (int) y);
+        return false;
     }
 
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
-        scaleFactor *= detector.getScaleFactor();
-        return chargeToScale != null;
+//        scaleFactor *= detector.getScaleFactor();
+        return false;
     }
 
     @Override
     public void onScaleEnd(ScaleGestureDetector detector) {
-        if ((chargeToScale != null) && (scaleFactor != 1f)) {
-            chargeToScale.size *= scaleFactor;
-            fieldsView.restart();
-        }
-    }
-
-    private void fieldClicked(MotionEvent e) {
-        int x = (int) e.getX();
-        int y = (int) e.getY();
-        long duration = Math.min(SystemClock.uptimeMillis() - e.getDownTime(), DateUtils.SECOND_IN_MILLIS);
-        double size = 1.0 + (int) (duration / 20L);
-        fieldClicked(x, y, size);
-    }
-
-    private void fieldClicked(int x, int y, double size) {
-        if (fieldsView.invertCharge(x, y) || fieldsView.addCharge(x, y, size)) {
-            fieldsView.restart();
-        }
+//        if ((chargeToScale != null) && (scaleFactor != 1f)) {
+//            chargeToScale.size *= scaleFactor;
+//            fieldsView.restart();
+//        }
     }
 
     @Override
@@ -177,6 +158,7 @@ public class MainActivity extends Activity implements
         getMenuInflater().inflate(R.menu.main, menu);
 
         menuStop = menu.findItem(R.id.menu_stop);
+        menuStop.setEnabled(fieldsView.isRendering());
 
         return true;
     }
@@ -222,11 +204,11 @@ public class MainActivity extends Activity implements
     }
 
     @Override
-    public void onChargeAdded(FractalsView view, Charge charge) {
+    public void onRenderFieldPan(FractalsView view, int dx, int dy) {
     }
 
     @Override
-    public void onChargeInverted(FractalsView view, Charge charge) {
+    public void onRenderFieldZoom(FractalsView view, double scale) {
     }
 
     @Override

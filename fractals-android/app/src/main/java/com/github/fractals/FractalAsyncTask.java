@@ -28,7 +28,7 @@ import android.os.AsyncTask;
  *
  * @author Moshe Waisberg
  */
-public class FractalAsyncTask extends AsyncTask<Charge, Canvas, Canvas> {
+public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
 
     public interface FieldAsyncTaskListener {
         /**
@@ -86,7 +86,7 @@ public class FractalAsyncTask extends AsyncTask<Charge, Canvas, Canvas> {
     }
 
     @Override
-    protected Canvas doInBackground(Charge... params) {
+    protected Canvas doInBackground(Double... params) {
         try {
             Thread.sleep(startDelay);
         } catch (InterruptedException e) {

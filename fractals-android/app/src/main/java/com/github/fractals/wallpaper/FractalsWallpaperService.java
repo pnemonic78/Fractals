@@ -19,15 +19,11 @@ package com.github.fractals.wallpaper;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.os.SystemClock;
 import android.service.wallpaper.WallpaperService;
 import android.text.format.DateUtils;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
-
-import com.github.fractals.Charge;
-import com.github.fractals.FractalsView;
 
 import java.util.Random;
 
@@ -123,22 +119,10 @@ public class FractalsWallpaperService extends WallpaperService {
          * @param delay the start delay, in milliseconds.
          */
         private void randomise(long delay) {
-            int w = fieldsView.getWidth();
-            int h = fieldsView.getHeight();
-            int count = 1 + random.nextInt(FractalsView.MAX_CHARGES);
             fieldsView.clear();
-            for (int i = 0; i < count; i++) {
-                fieldsView.addCharge(random.nextInt(w), random.nextInt(h), (random.nextBoolean() ? +1 : -1) * (1 + (random.nextDouble() * 20)));
-            }
+            //TODO fieldsView.setPan(random.nextInt(), random.nextInt());
+            //TODO fieldsView.setZoom(1 + (random.nextDouble() * 100));
             fieldsView.restart(delay);
-        }
-
-        @Override
-        public void onChargeAdded(WallpaperView view, Charge charge) {
-        }
-
-        @Override
-        public void onChargeInverted(WallpaperView view, Charge charge) {
         }
 
         @Override
@@ -213,8 +197,7 @@ public class FractalsWallpaperService extends WallpaperService {
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            fieldClicked(e);
-            return true;
+            return false;
         }
 
         @Override
@@ -225,20 +208,6 @@ public class FractalsWallpaperService extends WallpaperService {
         @Override
         public boolean onDoubleTapEvent(MotionEvent e) {
             return false;
-        }
-
-        private void fieldClicked(MotionEvent e) {
-            int x = (int) e.getX();
-            int y = (int) e.getY();
-            long duration = Math.min(SystemClock.uptimeMillis() - e.getDownTime(), DateUtils.SECOND_IN_MILLIS);
-            double size = 1.0 + (int) (duration / 20L);
-            fieldClicked(x, y, size);
-        }
-
-        private void fieldClicked(int x, int y, double size) {
-            if (fieldsView.invertCharge(x, y) || fieldsView.addCharge(x, y, size)) {
-                fieldsView.restart();
-            }
         }
     }
 }

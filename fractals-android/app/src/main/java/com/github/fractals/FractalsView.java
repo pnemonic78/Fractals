@@ -18,7 +18,6 @@
 package com.github.fractals;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -29,10 +28,6 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.View;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 /**
  * Fractals view.
  *
@@ -40,12 +35,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTaskListener {
 
-    public static final int MAX_CHARGES = 10;
-
-    private final List<Charge> charges = new CopyOnWriteArrayList<>();
     private Bitmap bitmap;
     private FractalAsyncTask task;
-    private int sameChargeDistance;
     private FractalsListener listener;
 
     public FractalsView(Context context) {
@@ -64,62 +55,10 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
     }
 
     private void init(Context context) {
-        Resources res = context.getResources();
-        sameChargeDistance = res.getDimensionPixelSize(R.dimen.same_charge);
-        sameChargeDistance = sameChargeDistance * sameChargeDistance;
-    }
-
-    public boolean addCharge(int x, int y, double size) {
-        return addCharge(new Charge(x, y, size));
-    }
-
-    public boolean addCharge(Charge charge) {
-        if (charges.size() < MAX_CHARGES) {
-            if (charges.add(charge)) {
-                if (listener != null) {
-                    listener.onChargeAdded(this, charge);
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean invertCharge(int x, int y) {
-        Charge charge = findCharge(x, y);
-        if (charge != null) {
-            charge.size = -charge.size;
-            if (listener != null) {
-                listener.onChargeInverted(this, charge);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public Charge findCharge(int x, int y) {
-        final int count = charges.size();
-        Charge charge;
-        Charge chargeNearest = null;
-        int dx, dy, d;
-        int dMin = Integer.MAX_VALUE;
-
-        for (int i = 0; i < count; i++) {
-            charge = charges.get(i);
-            dx = x - charge.x;
-            dy = y - charge.y;
-            d = (dx * dx) + (dy * dy);
-            if ((d <= sameChargeDistance) && (d < dMin)) {
-                chargeNearest = charge;
-                dMin = d;
-            }
-        }
-
-        return chargeNearest;
     }
 
     public void clear() {
-        charges.clear();
+        //TODO reset zoom and pan.
     }
 
     @Override
@@ -134,7 +73,7 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
     public void start() {
         if (!isRendering()) {
             task = new FractalAsyncTask(this, new Canvas(getBitmap()));
-            task.execute(charges.toArray(new Charge[charges.size()]));
+            task.execute(/*TODO panX, panY, zoom*/);
         }
     }
 
@@ -230,13 +169,11 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
     protected Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
 
-        if (charges.size() > 0) {
-            SavedState ss = new SavedState(superState);
-            ss.charges = charges;
-            return ss;
-        }
-
-        return superState;
+        SavedState ss = new SavedState(superState);
+        //TODO ss.panX = panX;
+        //TODO ss.panY = panY;
+        //TODO ss.zoom = zoom;
+        return ss;
     }
 
     @Override
@@ -249,11 +186,10 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
         SavedState ss = (SavedState) state;
         super.onRestoreInstanceState(ss.getSuperState());
 
-        if (ss.charges != null) {
+        if (ss.zoom != 0) {
             clear();
-            for (Charge charge : ss.charges) {
-                addCharge(charge);
-            }
+            //TODO setPan(ss.panX, ss.panY);
+            //TODO setZoom(ss.zoom);
             restart();
         }
     }
@@ -269,12 +205,14 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
 
     public static class SavedState extends BaseSavedState {
 
-        List<Charge> charges;
+        int panX, panY;
+        double zoom;
 
         protected SavedState(Parcel source) {
             super(source);
-            charges = new ArrayList<>();
-            source.readTypedList(charges, Charge.CREATOR);
+            panX = source.readInt();
+            panY = source.readInt();
+            zoom = source.readDouble();
         }
 
         protected SavedState(Parcelable superState) {
@@ -284,7 +222,9 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
         @Override
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
-            out.writeTypedList(charges);
+            out.writeInt(panX);
+            out.writeInt(panY);
+            out.writeDouble(zoom);
         }
 
         public static final Parcelable.Creator<SavedState> CREATOR

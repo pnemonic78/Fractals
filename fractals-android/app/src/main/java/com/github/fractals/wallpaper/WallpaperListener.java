@@ -17,18 +17,12 @@
  */
 package com.github.fractals.wallpaper;
 
-import com.github.fractals.Charge;
-
 /**
  * Fractals event listener for live wallpaper.
  *
  * @author Moshe Waisberg
  */
 public interface WallpaperListener {
-
-    void onChargeAdded(WallpaperView view, Charge charge);
-
-    void onChargeInverted(WallpaperView view, Charge charge);
 
     void onRenderFieldStarted(WallpaperView view);
 

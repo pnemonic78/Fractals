@@ -18,20 +18,12 @@
 package com.github.fractals.wallpaper;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.os.AsyncTask;
 
-import com.github.fractals.Charge;
 import com.github.fractals.FractalAsyncTask;
-import com.github.fractals.R;
-
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import static com.github.fractals.FractalsView.MAX_CHARGES;
 
 /**
  * Live wallpaper view.
@@ -41,70 +33,16 @@ import static com.github.fractals.FractalsView.MAX_CHARGES;
 public class WallpaperView implements FractalAsyncTask.FieldAsyncTaskListener {
 
     private int width, height;
-    private final List<Charge> charges = new CopyOnWriteArrayList<>();
     private Bitmap bitmap;
     private FractalAsyncTask task;
-    private int sameChargeDistance;
     private WallpaperListener listener;
 
     public WallpaperView(Context context, WallpaperListener listener) {
-        Resources res = context.getResources();
-        sameChargeDistance = res.getDimensionPixelSize(R.dimen.same_charge);
-        sameChargeDistance = sameChargeDistance * sameChargeDistance;
         setWallpaperListener(listener);
     }
 
-    public boolean addCharge(int x, int y, double size) {
-        return addCharge(new Charge(x, y, size));
-    }
-
-    public boolean addCharge(Charge charge) {
-        if (charges.size() < MAX_CHARGES) {
-            if (charges.add(charge)) {
-                if (listener != null) {
-                    listener.onChargeAdded(this, charge);
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean invertCharge(int x, int y) {
-        Charge charge = findCharge(x, y);
-        if (charge != null) {
-            charge.size = -charge.size;
-            if (listener != null) {
-                listener.onChargeInverted(this, charge);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public Charge findCharge(int x, int y) {
-        final int count = charges.size();
-        Charge charge;
-        Charge chargeNearest = null;
-        int dx, dy, d;
-        int dMin = Integer.MAX_VALUE;
-
-        for (int i = 0; i < count; i++) {
-            charge = charges.get(i);
-            dx = x - charge.x;
-            dy = y - charge.y;
-            d = (dx * dx) + (dy * dy);
-            if ((d <= sameChargeDistance) && (d < dMin)) {
-                chargeNearest = charge;
-                dMin = d;
-            }
-        }
-
-        return chargeNearest;
-    }
-
     public void clear() {
-        charges.clear();
+        //TODO reset pan and zoom.
     }
 
     public void draw(Canvas canvas) {
@@ -133,7 +71,7 @@ public class WallpaperView implements FractalAsyncTask.FieldAsyncTaskListener {
             task.setSaturation(0.5f);
             task.setBrightness(0.5f);
             task.setStartDelay(delay);
-            task.execute(charges.toArray(new Charge[charges.size()]));
+            task.execute();
         }
     }
 

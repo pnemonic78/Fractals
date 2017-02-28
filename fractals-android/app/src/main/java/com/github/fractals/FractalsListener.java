@@ -24,9 +24,9 @@ package com.github.fractals;
  */
 public interface FractalsListener {
 
-    void onChargeAdded(FractalsView view, Charge charge);
+    void onRenderFieldZoom(FractalsView view, double scale);
 
-    void onChargeInverted(FractalsView view, Charge charge);
+    void onRenderFieldPan(FractalsView view, int dx, int dy);
 
     void onRenderFieldStarted(FractalsView view);
 
