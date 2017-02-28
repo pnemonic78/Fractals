@@ -8,7 +8,7 @@
     <!-- Saved. -->
     <string name="menu_save_file">Save to file</string>
     <string name="saving_title" translatable="false">@string/app_name</string>
-    <string name="saving_text">Saving image to file�</string>
+    <string name="saving_text">Saving image to file…</string>
     <string name="saved_title">Fractals are saved.</string>
     <string name="saved_text">Touch to view your fields.</string>
     <string name="save_failed">Saving image failed.</string>
