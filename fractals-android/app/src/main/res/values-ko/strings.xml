@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">전기장</string>
+
+    <!-- Notifications. -->
+    <string name="finished">렌더링이 완료되었습니다.</string>
+
+    <!-- Saved. -->
+    <string name="menu_save_file">파일에 저장</string>
+    <string name="saving_text">이미지를 파일에 저장 중…</string>
+    <string name="saved_title">전기장이 저장됩니다.</string>
+    <string name="saved_text">터치하여 입력란을 봅니다.</string>
+    <string name="save_failed">이미지 저장에 실패했습니다.</string>
+
+    <!-- Menu. -->
+    <string name="menu_fullscreen">전체 화면</string>
+    <string name="menu_random">무작위</string>
+</resources>
