@@ -14,5 +14,4 @@
 
     <!-- Menu. -->
     <string name="menu_fullscreen">전체 화면</string>
-    <string name="menu_random">무작위</string>
 </resources>
