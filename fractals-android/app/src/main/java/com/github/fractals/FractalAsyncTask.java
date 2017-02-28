@@ -67,8 +67,8 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
     private final float[] hsv = {0f, 1f, 1f};
     private long startDelay = 0L;
     private double zoom = 1;
-    private int panX = 0;
-    private int panY = 0;
+    private double scrollX = 0;
+    private double scrollY = 0;
 
     public FractalAsyncTask(FieldAsyncTaskListener listener, Canvas canvas) {
         this.listener = listener;
@@ -84,6 +84,10 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         paint.setStrokeWidth(1);
 
         listener.onTaskStarted(this);
+
+        scrollX = 0;
+        scrollY = 0;
+        zoom = 1;
     }
 
     @Override
@@ -92,6 +96,13 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
             Thread.sleep(startDelay);
         } catch (InterruptedException e) {
             // Ignore.
+        }
+        if (params.length >= 2) {
+            scrollX = params[0];
+            scrollY = params[1];
+            if (params.length >= 3) {
+                zoom = params[2];
+            }
         }
 
         int w = canvas.getWidth();
@@ -180,8 +191,8 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
      * http://en.wikipedia.org/wiki/Mandelbrot_set
      */
     private void plotMandelbrot(Canvas canvas, int x, int y, int w, int h, int sw, int sh, double density) {
-        double kRe = (((x + panX) / zoom / (sw / 3.5)) - 2.5);
-        double kIm = (((y + panY) / zoom / (sh / 3.5)) - 2.5);
+        double kRe = ((x + scrollX) / zoom / (sw / 3.5)) - 2.5;
+        double kIm = ((y + scrollY) / zoom / (sh / 3.5)) - 2.5;
         double zRe = 0;
         double zIm = 0;
         double zReSrq = 0;
@@ -196,7 +207,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
             zReSrq = zRe * zRe;
             zImSrq = zIm * zIm;
             i++;
-        } while ((i <= 1000) && ((zReSrq + zImSrq) < 9));
+        } while ((i < 1000) && ((zReSrq + zImSrq) < 9));
 
         paint.setColor(mapColor(i, density));
         rect.set(x, y, x + w, y + h);

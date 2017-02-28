@@ -56,8 +56,10 @@ public class MainActivity extends Activity implements
     private GestureDetector gestureDetector;
     private ScaleGestureDetector scaleGestureDetector;
     private AsyncTask saveTask;
-    private float scaleFactor = 1f;
     private MenuItem menuStop;
+    private float scaleFactor = 1f;
+    private float scrollX, scrollY;
+    private boolean scrolling;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +84,16 @@ public class MainActivity extends Activity implements
         if (v == fieldsView) {
             boolean result = scaleGestureDetector.onTouchEvent(event);
             result = gestureDetector.onTouchEvent(event) || result;
-            return result || super.onTouchEvent(event);
+            result = result || super.onTouchEvent(event);
+
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_CANCEL:
+                case MotionEvent.ACTION_UP:
+                    onScrollFinished();
+                    break;
+            }
+
+            return result;
         }
         return false;
     }
@@ -103,7 +114,23 @@ public class MainActivity extends Activity implements
 
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        return false;
+        scrolling = true;
+        scrollX += distanceX;
+        scrollY += distanceY;
+        fieldsView.scrollTo((int) scrollX, (int) scrollY);
+        return true;
+    }
+
+    private void onScrollFinished() {
+        if (scrolling) {
+            scrolling = false;
+            fieldsView.cancel();
+            fieldsView.addScroll(scrollX, scrollY);
+            scrollX = 0;
+            scrollY = 0;
+            fieldsView.start();
+            fieldsView.scrollTo(0, 0);
+        }
     }
 
     @Override
@@ -141,7 +168,7 @@ public class MainActivity extends Activity implements
 
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
-//        scaleFactor *= detector.getScaleFactor();
+        scaleFactor *= detector.getScaleFactor();
         return false;
     }
 

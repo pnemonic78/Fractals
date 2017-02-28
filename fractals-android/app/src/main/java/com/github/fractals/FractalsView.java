@@ -38,27 +38,26 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
     private Bitmap bitmap;
     private FractalAsyncTask task;
     private FractalsListener listener;
+    private float scrollX = 0;
+    private float scrollY = 0;
+    private float zoom = 1;
 
     public FractalsView(Context context) {
         super(context);
-        init(context);
     }
 
     public FractalsView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context);
     }
 
     public FractalsView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
-    }
-
-    private void init(Context context) {
     }
 
     public void clear() {
-        //TODO reset zoom and pan.
+        scrollX = 0;
+        scrollY = 0;
+        zoom = 1;
     }
 
     @Override
@@ -73,7 +72,7 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
     public void start() {
         if (!isRendering()) {
             task = new FractalAsyncTask(this, new Canvas(getBitmap()));
-            task.execute(/*TODO panX, panY, zoom*/);
+            task.execute((double) scrollX, (double) scrollY, (double) zoom);
         }
     }
 
@@ -170,9 +169,9 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
         Parcelable superState = super.onSaveInstanceState();
 
         SavedState ss = new SavedState(superState);
-        //TODO ss.panX = panX;
-        //TODO ss.panY = panY;
-        //TODO ss.zoom = zoom;
+        ss.scrollX = scrollX;
+        ss.scrollY = scrollY;
+        ss.zoom = zoom;
         return ss;
     }
 
@@ -188,8 +187,9 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
 
         if (ss.zoom != 0) {
             clear();
-            //TODO setPan(ss.panX, ss.panY);
-            //TODO setZoom(ss.zoom);
+            scrollX = ss.scrollX;
+            scrollY = ss.scrollY;
+            zoom = ss.zoom;
             restart();
         }
     }
@@ -203,16 +203,38 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
         return (task != null) && !task.isCancelled() && (task.getStatus() != AsyncTask.Status.FINISHED);
     }
 
+    /**
+     * Set the scrolling offsets.
+     *
+     * @param scrollX the horizontal offset.
+     * @param scrollY the vertical offset.
+     */
+    public void setScroll(float scrollX, float scrollY) {
+        this.scrollX = scrollX;
+        this.scrollY = scrollY;
+    }
+
+    /**
+     * Add scrolling offsets.
+     *
+     * @param scrollX the horizontal offset.
+     * @param scrollY the vertical offset.
+     */
+    public void addScroll(float scrollX, float scrollY) {
+        this.scrollX += scrollX;
+        this.scrollY += scrollY;
+    }
+
     public static class SavedState extends BaseSavedState {
 
-        int panX, panY;
-        double zoom;
+        float scrollX, scrollY;
+        float zoom;
 
         protected SavedState(Parcel source) {
             super(source);
-            panX = source.readInt();
-            panY = source.readInt();
-            zoom = source.readDouble();
+            scrollX = source.readFloat();
+            scrollY = source.readFloat();
+            zoom = source.readFloat();
         }
 
         protected SavedState(Parcelable superState) {
@@ -222,9 +244,9 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
         @Override
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
-            out.writeInt(panX);
-            out.writeInt(panY);
-            out.writeDouble(zoom);
+            out.writeFloat(scrollX);
+            out.writeFloat(scrollY);
+            out.writeFloat(zoom);
         }
 
         public static final Parcelable.Creator<SavedState> CREATOR
