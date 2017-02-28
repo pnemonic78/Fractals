@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Elektrische Velden</string>
+    <string name="app_name">Fractals</string>
 
     <!-- Notifications. -->
     <string name="finished">Tekening is voltooid.</string>
@@ -8,7 +8,7 @@
     <!-- Saved. -->
     <string name="menu_save_file">Opslaan naar bestand</string>
     <string name="saving_text">Afbeeldingen opslaan naar bestand…</string>
-    <string name="saved_title">Elektrische velden worden opgeslagen.</string>
+    <string name="saved_title">Fractals worden opgeslagen.</string>
     <string name="saved_text">Raak aan om uw velden te bekijken.</string>
     <string name="save_failed">Mislukt afbeelding op te slaan.</string>
 

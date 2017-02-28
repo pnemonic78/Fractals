@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Elektriväljade</string>
+    <string name="app_name">Fraktaale</string>
 
     <!-- Notifications. -->
     <string name="finished">Joonistus on lõppenud.</string>
@@ -8,7 +8,7 @@
     <!-- Saved. -->
     <string name="menu_save_file">Salvesta faili</string>
     <string name="saving_text">Pildi salvestamine faili…</string>
-    <string name="saved_title">Elektriväljade salvestatakse.</string>
+    <string name="saved_title">Fraktaale salvestatakse.</string>
     <string name="saved_text">Puudutage, et vaadata oma valdkonnas.</string>
     <string name="save_failed">Õnnestunud salvestada pilti.</string>
 

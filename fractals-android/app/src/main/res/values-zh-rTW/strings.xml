@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">電場</string>
+    <string name="app_name">分形</string>
 
     <!-- Notifications. -->
     <string name="finished">繪畫完成。</string>
@@ -8,7 +8,7 @@
     <!-- Saved. -->
     <string name="menu_save_file">保存到文件</string>
     <string name="saving_text">正在將圖片保存到文件…</string>
-    <string name="saved_title">電場得以節省。</string>
+    <string name="saved_title">分形得以節省。</string>
     <string name="saved_text">觸摸可查看字段。</string>
     <string name="save_failed">無法保存圖片。</string>
 

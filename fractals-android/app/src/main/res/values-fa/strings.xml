@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">میدان های الکتریکی</string>
+    <string name="app_name">فرکتال</string>
 
     <!-- Notifications. -->
     <string name="finished">نقاشی به پایان رسید است.</string>
@@ -8,7 +8,7 @@
     <!-- Saved. -->
     <string name="menu_save_file">ذخیره در فایل</string>
     <string name="saving_text">صرفه جویی در تصویر به فایل…</string>
-    <string name="saved_title">میدان های الکتریکی را نجات داد.</string>
+    <string name="saved_title">فرکتال را نجات داد.</string>
     <string name="saved_text">به مشاهده زمینه های خود را لمس کنید.</string>
     <string name="save_failed">برای ذخیره کردن تصویر شکست خورده است.</string>
 

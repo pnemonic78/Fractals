@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Електрически Полета</string>
+    <string name="app_name">Фрактали</string>
 
     <!-- Notifications. -->
     <string name="finished">Визуализация е завършен.</string>
@@ -8,7 +8,7 @@
     <!-- Saved. -->
     <string name="menu_save_file">Запазване на файл</string>
     <string name="saving_text">Запазване на изображението във файл…</string>
-    <string name="saved_title">Електрически полета са запазени.</string>
+    <string name="saved_title">Фракталите са запазени.</string>
     <string name="saved_text">Докоснете, за да видите полета си.</string>
     <string name="save_failed">Неуспешно запазване на изображението.</string>
 

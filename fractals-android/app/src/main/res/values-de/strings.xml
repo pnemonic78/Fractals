@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Elektrische Felder</string>
+    <string name="app_name">Fraktale</string>
 
     <!-- Notifications. -->
     <string name="finished">Zeichnung ist fertig.</string>
@@ -8,7 +8,7 @@
     <!-- Saved. -->
     <string name="menu_save_file">In Datei speichern</string>
     <string name="saving_text">Bild wird gespeichert…</string>
-    <string name="saved_title">Elektrische Felder werden gespeichert.</string>
+    <string name="saved_title">Fraktale werden gespeichert.</string>
     <string name="saved_text">Berühren Sie, um Ihre Felder anzuzeigen.</string>
     <string name="save_failed">Fehler beim Speichern des Bildes.</string>
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Sähkökentät</string>
+    <string name="app_name">Fraktaalit</string>
 
     <!-- Notifications. -->
     <string name="finished">Piirustus on päättynyt.</string>
@@ -8,7 +8,7 @@
     <!-- Saved. -->
     <string name="menu_save_file">Tallenna tiedosto</string>
     <string name="saving_text">Tallentaminen kuvan tiedostoon…</string>
-    <string name="saved_title">Sähkökentät tallennetaan.</string>
+    <string name="saved_title">Fraktaalit tallennetaan.</string>
     <string name="saved_text">Koskettamalla tarkastella kenttiä.</string>
     <string name="save_failed">Tallennus epäonnistui kuvan.</string>
 

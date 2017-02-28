@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Ηλεκτρικά Πεδία</string>
+    <string name="app_name">Φράκταλς</string>
 
     <!-- Notifications. -->
     <string name="finished">Αντλώντας έχει τελειώσει.</string>
@@ -8,7 +8,7 @@
     <!-- Saved. -->
     <string name="menu_save_file">Αποθήκευση σε αρχείο</string>
     <string name="saving_text">Αποθήκευση εικόνας σε αρχείο…</string>
-    <string name="saved_title">Τα ηλεκτρικά πεδία σώζονται.</string>
+    <string name="saved_title">Τα φράκταλς σώζονται.</string>
     <string name="saved_text">Αγγίξτε για να δείτε τα πεδία σας.</string>
     <string name="save_failed">Αποτυχία για να αποθηκεύσετε την εικόνα.</string>
 

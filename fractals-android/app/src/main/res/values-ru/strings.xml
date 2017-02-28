@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Электрические Поля</string>
+    <string name="app_name">Фракталы</string>
 
     <!-- Notifications. -->
     <string name="finished">Рисование закончена.</string>
@@ -8,7 +8,7 @@
     <!-- Saved. -->
     <string name="menu_save_file">Сохранить в файл</string>
     <string name="saving_text">Сохранение изображения в файл…</string>
-    <string name="saved_title">Электрические поля сохраняются.</string>
+    <string name="saved_title">Фракталы сохраняются.</string>
     <string name="saved_text">Нажмите для просмотра полей.</string>
     <string name="save_failed">Не удалось сохранить изображение.</string>
 
