@@ -60,6 +60,10 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         void repaint(FractalAsyncTask task);
     }
 
+    private static final double SET_MIN = -2.5;
+    private static final double SET_MAX = 1;
+    private static final double SET_SIZE = SET_MAX - SET_MIN;
+
     private static final double LOG2 = Math.log(2);
     private static final double LOG2_2 = LOG2 * 2;
 
@@ -111,7 +115,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         int w = canvas.getWidth();
         int h = canvas.getHeight();
         int size = Math.max(w, h);
-        int sizeMin = Math.min(w, h);
+        double sizeForSet = Math.min(w, h) / SET_SIZE;
 
         int shifts = 0;
         while (size > 1) {
@@ -125,7 +129,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         int resolution = resolution2;
 
         canvas.drawColor(Color.WHITE);
-        plotMandelbrot(canvas, 0, 0, resolution, resolution, sizeMin, density);
+        plotMandelbrot(canvas, 0, 0, resolution, resolution, sizeForSet, density);
 
         int x1, y1, x2, y2;
 
@@ -138,9 +142,9 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
                 x2 = resolution;
 
                 while (x1 < w) {
-                    plotMandelbrot(canvas, x1, y2, resolution, resolution, sizeMin, density);
-                    plotMandelbrot(canvas, x2, y1, resolution, resolution, sizeMin, density);
-                    plotMandelbrot(canvas, x2, y2, resolution, resolution, sizeMin, density);
+                    plotMandelbrot(canvas, x1, y2, resolution, resolution, sizeForSet, density);
+                    plotMandelbrot(canvas, x2, y1, resolution, resolution, sizeForSet, density);
+                    plotMandelbrot(canvas, x2, y2, resolution, resolution, sizeForSet, density);
 
                     x1 += resolution2;
                     x2 += resolution2;
@@ -192,9 +196,9 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
      * <br>
      * http://en.wikipedia.org/wiki/Mandelbrot_set
      */
-    private void plotMandelbrot(Canvas canvas, int x, int y, int w, int h, int size, double density) {
-        double kRe = (((x / zoom) + scrollX) / (size / 3.5)) - 2.5;
-        double kIm = (((y / zoom) + scrollY) / (size / 3.5)) - 2.5;
+    private void plotMandelbrot(Canvas canvas, int x, int y, int w, int h, double size, double density) {
+        double kRe = ((((x) + scrollX) / size) + SET_MIN) / zoom;
+        double kIm = ((((y) + scrollY) / size) + SET_MIN) / zoom;
         double zRe = 0;
         double zIm = 0;
         double zReSrq = 0;
@@ -202,6 +206,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         double d;
         double r;
         int i = 0;
+        boolean underflow = true;
 
         do {
             r = zReSrq - zImSrq + kRe;
@@ -211,10 +216,11 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
             zImSrq = zIm * zIm;
             d = zReSrq + zImSrq;
             i++;
-        } while ((i < 1000) && (d < 9));
+            underflow = i < 1000;
+        } while (underflow && (d < 9));
 
         double z = i;
-        if (i < 1000) {
+        if (underflow) {
             z += 1 - (Math.log(Math.log(d) / LOG2_2) / LOG2);
         }
 
