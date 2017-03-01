@@ -225,6 +225,15 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
         this.scrollY += scrollY;
     }
 
+    /**
+     * Set the zoom scale factor.
+     *
+     * @param zoom the zoom.
+     */
+    public void setZoom(float zoom) {
+        this.zoom = zoom;
+    }
+
     public static class SavedState extends BaseSavedState {
 
         float scrollX, scrollY;

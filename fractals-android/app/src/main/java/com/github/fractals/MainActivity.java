@@ -25,8 +25,6 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.text.format.DateUtils;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -52,22 +50,25 @@ public class MainActivity extends Activity implements
 
     private static final int REQUEST_SAVE = 1;
 
-    private FractalsView fieldsView;
+    private FractalsView fractalsView;
     private GestureDetector gestureDetector;
     private ScaleGestureDetector scaleGestureDetector;
     private AsyncTask saveTask;
     private MenuItem menuStop;
-    private float scaleFactor = 1f;
+    private float zoom = 1f;
     private float scrollX, scrollY;
+    private float scrollXViewing, scrollYViewing;
+    private float zoomViewing = 1f;
     private boolean scrolling;
+    private final float[] matrixValues = new float[9];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        fieldsView = (FractalsView) findViewById(R.id.fractals);
-        fieldsView.setOnTouchListener(this);
-        fieldsView.setElectricFieldsListener(this);
+        fractalsView = (FractalsView) findViewById(R.id.fractals);
+        fractalsView.setOnTouchListener(this);
+        fractalsView.setElectricFieldsListener(this);
 
         gestureDetector = new GestureDetector(this, this);
         scaleGestureDetector = new ScaleGestureDetector(this, this);
@@ -76,12 +77,12 @@ public class MainActivity extends Activity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        fieldsView.cancel();
+        fractalsView.cancel();
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        if (v == fieldsView) {
+        if (v == fractalsView) {
             boolean result = scaleGestureDetector.onTouchEvent(event);
             result = gestureDetector.onTouchEvent(event) || result;
             result = result || super.onTouchEvent(event);
@@ -117,20 +118,22 @@ public class MainActivity extends Activity implements
         scrolling = true;
         scrollX += distanceX;
         scrollY += distanceY;
-        fieldsView.scrollTo((int) scrollX, (int) scrollY);
+        scrollXViewing += distanceX;
+        scrollYViewing += distanceY;
+        fractalsView.scrollTo((int) scrollXViewing, (int) scrollYViewing);
         return true;
     }
 
     private void onScrollFinished() {
         if (scrolling) {
             scrolling = false;
-            fieldsView.cancel();
-            fieldsView.addScroll(scrollX, scrollY);
-            scrollX = 0;
-            scrollY = 0;
-            fieldsView.start();
-            fieldsView.scrollTo(0, 0);
+            fractalsView.cancel();
+            fractalsView.setScroll(scrollX, scrollY);
+            fractalsView.scrollTo(0, 0);
+            fractalsView.start();
         }
+        scrollXViewing = 0;
+        scrollYViewing = 0;
     }
 
     @Override
@@ -159,25 +162,35 @@ public class MainActivity extends Activity implements
 
     @Override
     public boolean onScaleBegin(ScaleGestureDetector detector) {
-        scaleFactor = 1f;
-//        float x = detector.getFocusX();
-//        float y = detector.getFocusY();
-//        chargeToScale = fieldsView.findCharge((int) x, (int) y);
-        return false;
+        zoomViewing = 1f;
+        return true;
     }
 
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
-        scaleFactor *= detector.getScaleFactor();
-        return false;
+        zoomViewing *= detector.getScaleFactor();
+        fractalsView.setScaleX(zoomViewing);
+        fractalsView.setScaleY(zoomViewing);
+        return true;
     }
 
     @Override
     public void onScaleEnd(ScaleGestureDetector detector) {
-//        if ((chargeToScale != null) && (scaleFactor != 1f)) {
-//            chargeToScale.size *= scaleFactor;
-//            fieldsView.restart();
-//        }
+        System.out.println("~!@ onScaleEnd");
+        fractalsView.cancel();
+
+        zoom *= zoomViewing;
+        fractalsView.setZoom(zoom);
+
+        //scaling forces the corners beyond the visible rect.
+        fractalsView.getMatrix().getValues(matrixValues);
+        scrollX -= matrixValues[2] / zoomViewing;
+        scrollY -= matrixValues[5] / zoomViewing;
+        fractalsView.setScroll(scrollX, scrollY);
+
+        fractalsView.setScaleX(1);
+        fractalsView.setScaleY(1);
+        fractalsView.start();
     }
 
     @Override
@@ -185,7 +198,7 @@ public class MainActivity extends Activity implements
         getMenuInflater().inflate(R.menu.main, menu);
 
         menuStop = menu.findItem(R.id.menu_stop);
-        menuStop.setEnabled(fieldsView.isRendering());
+        menuStop.setEnabled(fractalsView.isRendering());
 
         return true;
     }
@@ -227,7 +240,7 @@ public class MainActivity extends Activity implements
         if ((saveTask != null) && (saveTask.getStatus() == AsyncTask.Status.RUNNING)) {
             return;
         }
-        saveTask = new SaveFileTask(this).execute(fieldsView.getBitmap());
+        saveTask = new SaveFileTask(this).execute(fractalsView.getBitmap());
     }
 
     @Override
@@ -240,7 +253,7 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onRenderFieldStarted(FractalsView view) {
-        if (view == fieldsView) {
+        if (view == fractalsView) {
             if (menuStop != null) {
                 menuStop.setEnabled(view.isRendering());
             }
@@ -249,7 +262,7 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onRenderFieldFinished(FractalsView view) {
-        if (view == fieldsView) {
+        if (view == fractalsView) {
             if (menuStop != null) {
                 menuStop.setEnabled(false);
             }
@@ -259,7 +272,7 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onRenderFieldCancelled(FractalsView view) {
-        if (view == fieldsView) {
+        if (view == fractalsView) {
             if (menuStop != null) {
                 menuStop.setEnabled(false);
             }
@@ -337,8 +350,8 @@ public class MainActivity extends Activity implements
     }
 
     private void stop() {
-        fieldsView.cancel();
-        fieldsView.clear();
+        fractalsView.cancel();
+        fractalsView.clear();
 
         if (saveTask != null) {
             saveTask.cancel(true);
@@ -346,7 +359,7 @@ public class MainActivity extends Activity implements
     }
 
     private void start() {
-        fieldsView.start();
+        fractalsView.start();
     }
 
     @Override

@@ -108,8 +108,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         int w = canvas.getWidth();
         int h = canvas.getHeight();
         int size = Math.max(w, h);
-        int sw = Math.min(w, h);
-        int sh = sw;
+        int sizeMin = Math.min(w, h);
 
         int shifts = 0;
         while (size > 1) {
@@ -123,7 +122,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         int resolution = resolution2;
 
         canvas.drawColor(Color.WHITE);
-        plotMandelbrot(canvas, 0, 0, resolution, resolution, sw, sh, density);
+        plotMandelbrot(canvas, 0, 0, resolution, resolution, sizeMin, density);
 
         int x1, y1, x2, y2;
 
@@ -136,9 +135,9 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
                 x2 = resolution;
 
                 while (x1 < w) {
-                    plotMandelbrot(canvas, x1, y2, resolution, resolution, sw, sh, density);
-                    plotMandelbrot(canvas, x2, y1, resolution, resolution, sw, sh, density);
-                    plotMandelbrot(canvas, x2, y2, resolution, resolution, sw, sh, density);
+                    plotMandelbrot(canvas, x1, y2, resolution, resolution, sizeMin, density);
+                    plotMandelbrot(canvas, x2, y1, resolution, resolution, sizeMin, density);
+                    plotMandelbrot(canvas, x2, y2, resolution, resolution, sizeMin, density);
 
                     x1 += resolution2;
                     x2 += resolution2;
@@ -190,9 +189,9 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
      * <br>
      * http://en.wikipedia.org/wiki/Mandelbrot_set
      */
-    private void plotMandelbrot(Canvas canvas, int x, int y, int w, int h, int sw, int sh, double density) {
-        double kRe = ((x + scrollX) / zoom / (sw / 3.5)) - 2.5;
-        double kIm = ((y + scrollY) / zoom / (sh / 3.5)) - 2.5;
+    private void plotMandelbrot(Canvas canvas, int x, int y, int w, int h, int size, double density) {
+        double kRe = (((x / zoom) + scrollX) / (size / 3.5)) - 2.5;
+        double kIm = (((y / zoom) + scrollY) / (size / 3.5)) - 2.5;
         double zRe = 0;
         double zIm = 0;
         double zReSrq = 0;
