@@ -215,17 +215,6 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
     }
 
     /**
-     * Add scrolling offsets.
-     *
-     * @param scrollX the horizontal offset.
-     * @param scrollY the vertical offset.
-     */
-    public void addScroll(float scrollX, float scrollY) {
-        this.scrollX += scrollX;
-        this.scrollY += scrollY;
-    }
-
-    /**
      * Set the zoom scale factor.
      *
      * @param zoom the zoom.

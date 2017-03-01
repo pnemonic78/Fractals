@@ -120,8 +120,11 @@ public class FractalsWallpaperService extends WallpaperService {
          */
         private void randomise(long delay) {
             fieldsView.clear();
-            //TODO fieldsView.setPan(random.nextInt(), random.nextInt());
-            //TODO fieldsView.setZoom(1 + (random.nextDouble() * 100));
+            float x = (random.nextBoolean() ? +0.25f : -0.25f) * random.nextFloat() * fieldsView.getWidth();
+            float y = (random.nextBoolean() ? +0.25f : -0.25f) * random.nextFloat() * fieldsView.getHeight();
+            float z = Math.max(0.25f, random.nextFloat() * 5);
+            fieldsView.setScroll(x, y);
+            fieldsView.setZoom(z);
             fieldsView.restart(delay);
         }
 
