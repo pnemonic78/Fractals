@@ -60,6 +60,9 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         void repaint(FractalAsyncTask task);
     }
 
+    private static final double LOG2 = Math.log(2);
+    private static final double LOG2_2 = LOG2 * 2;
+
     private final FieldAsyncTaskListener listener;
     private final Canvas canvas;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -196,6 +199,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         double zIm = 0;
         double zReSrq = 0;
         double zImSrq = 0;
+        double d;
         double r;
         int i = 0;
 
@@ -205,10 +209,16 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
             zRe = r;
             zReSrq = zRe * zRe;
             zImSrq = zIm * zIm;
+            d = zReSrq + zImSrq;
             i++;
-        } while ((i < 1000) && ((zReSrq + zImSrq) < 9));
+        } while ((i < 1000) && (d < 9));
 
-        paint.setColor(mapColor(i, density));
+        double z = i;
+        if (i < 1000) {
+            z += 1 - (Math.log(Math.log(d) / LOG2_2) / LOG2);
+        }
+
+        paint.setColor(mapColor(z, density));
         rect.set(x, y, x + w, y + h);
         canvas.drawRect(rect, paint);
     }
