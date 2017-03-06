@@ -68,7 +68,8 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
     private static final double IM_SIZE = IM_MAX - IM_MIN;
 
     private static final double LOG2 = Math.log(2);
-    private static final double LOG2_2 = LOG2 * 2;
+    private static final double LOG2_LOG2 = Math.log(LOG2) / LOG2;
+    private static final double LOG2_LOG2_2 = 2 + LOG2_LOG2;
 
     private final FieldAsyncTaskListener listener;
     private final Canvas canvas;
@@ -226,7 +227,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
 
         double z = i;
         if (underflow) {
-            z += 1 - (Math.log(Math.log(d) / LOG2_2) / LOG2);
+            z += LOG2_LOG2_2 - (Math.log(Math.log(d)) / LOG2);
         }
 
         paint.setColor(mapColor(z, density));
