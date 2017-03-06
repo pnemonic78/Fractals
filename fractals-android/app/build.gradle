@@ -42,6 +42,8 @@ android {
 
     lintOptions {
         disable "AllowBackup"
+        disable "AlwaysShowAction"
+        disable "ClickableViewAccessibility"
         disable "GoogleAppIndexingWarning"
     }
 }
