@@ -116,21 +116,22 @@ public class MainActivity extends Activity implements
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
         scrolling = true;
-        scrollX += distanceX;
-        scrollY += distanceY;
-        scrollXViewing += distanceX;
-        scrollYViewing += distanceY;
-        fractalsView.scrollTo((int) scrollXViewing, (int) scrollYViewing);
-        return true;
+//        scrollX += distanceX;
+//        scrollY += distanceY;
+//        scrollXViewing += distanceX;
+//        scrollYViewing += distanceY;
+//        fractalsView.scrollTo((int) scrollXViewing, (int) scrollYViewing);
+//        return true;
+        return false;
     }
 
     private void onScrollFinished() {
         if (scrolling) {
             scrolling = false;
-            fractalsView.cancel();
-            fractalsView.setScroll(scrollX, scrollY);
-            fractalsView.scrollTo(0, 0);
-            fractalsView.start();
+//            fractalsView.cancel();
+//            fractalsView.setScroll(scrollX, scrollY);
+//            fractalsView.scrollTo(0, 0);
+//            fractalsView.start();
         }
         scrollXViewing = 0;
         scrollYViewing = 0;
@@ -169,28 +170,27 @@ public class MainActivity extends Activity implements
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
         zoomViewing *= detector.getScaleFactor();
-        fractalsView.setScaleX(zoomViewing);
-        fractalsView.setScaleY(zoomViewing);
+//        fractalsView.setScaleX(zoomViewing);
+//        fractalsView.setScaleY(zoomViewing);
         return true;
     }
 
     @Override
     public void onScaleEnd(ScaleGestureDetector detector) {
-        System.out.println("~!@ onScaleEnd");
-        fractalsView.cancel();
-
-        zoom *= zoomViewing;
-        fractalsView.setZoom(zoom);
-
-        //scaling forces the corners beyond the visible rect.
-        fractalsView.getMatrix().getValues(matrixValues);
-        scrollX -= matrixValues[2] / zoomViewing;
-        scrollY -= matrixValues[5] / zoomViewing;
-        fractalsView.setScroll(scrollX, scrollY);
-
-        fractalsView.setScaleX(1);
-        fractalsView.setScaleY(1);
-        fractalsView.start();
+//        fractalsView.cancel();
+//
+//        zoom *= zoomViewing;
+//        fractalsView.setZoom(zoom);
+//
+//        //scaling forces the corners beyond the visible rect.
+//        fractalsView.getMatrix().getValues(matrixValues);
+//        scrollX -= matrixValues[2] / zoomViewing;
+//        scrollY -= matrixValues[5] / zoomViewing;
+//        fractalsView.setScroll(scrollX, scrollY);
+//
+//        fractalsView.setScaleX(1);
+//        fractalsView.setScaleY(1);
+//        fractalsView.start();
     }
 
     @Override
