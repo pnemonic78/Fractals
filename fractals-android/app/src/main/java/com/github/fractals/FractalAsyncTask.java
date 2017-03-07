@@ -103,10 +103,12 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
 
     @Override
     protected Canvas doInBackground(Double... params) {
-        try {
-            Thread.sleep(startDelay);
-        } catch (InterruptedException e) {
-            // Ignore.
+        if (startDelay > 0L) {
+            try {
+                Thread.sleep(startDelay);
+            } catch (InterruptedException e) {
+                // Ignore.
+            }
         }
         if (params.length >= 2) {
             scrollX = params[0];
@@ -140,6 +142,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
 
         canvas.drawColor(Color.WHITE);
         plotMandelbrot(canvas, 0, 0, resolution, resolution, sizeSetRe, sizeSetIm, offsetRe, offsetIm, density);
+        listener.repaint(this);
 
         int x1, y1, x2, y2;
 
@@ -226,7 +229,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
             zImSrq = zIm * zIm;
             d = zReSrq + zImSrq;
             i++;
-            underflow = i < 1000;
+            underflow = i < 100;
         } while (underflow && (d < 9));
 
         double z = i;
