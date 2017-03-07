@@ -232,6 +232,8 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         double z = i;
         if (underflow) {
             z += LOG2_LOG2_2 - (Math.log(Math.log(d)) / LOG2);
+        } else {
+            z = 0;
         }
 
         paint.setColor(mapColor(z, density));
