@@ -120,8 +120,8 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         int h = canvas.getHeight();
         int sizeMax = Math.max(w, h);
         int sizeMin = Math.min(w, h);
-        double sizeRe = sizeMin; // landscape: "real" is always wider than "imaginary"
-        double sizeIm = sizeMin * IM_SIZE / RE_SIZE;
+        double sizeRe = (h >= w) ? sizeMin : sizeMin * RE_SIZE / IM_SIZE;
+        double sizeIm = (h >= w) ? sizeMin * IM_SIZE / RE_SIZE : sizeMin;
         double sizeSetRe = sizeRe / RE_SIZE;
         double sizeSetIm = sizeIm / IM_SIZE;
         double offsetRe = (w - sizeRe) / 2;
