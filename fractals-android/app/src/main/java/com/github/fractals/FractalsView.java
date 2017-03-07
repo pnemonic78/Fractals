@@ -63,7 +63,10 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawBitmap(getBitmap(), 0, 0, null);
+        Bitmap b = getBitmap();
+        int dx = (getMeasuredWidth() - b.getWidth()) / 2;
+        int dy = (getMeasuredHeight() - b.getHeight()) / 2;
+        canvas.drawBitmap(b, dx, dy, null);
     }
 
     /**
