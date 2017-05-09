@@ -66,6 +66,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
 
     private static final double LOG2 = Math.log(2);
     private static final double LOG2_2 = LOG2 * 2;
+    private static final int OVERFLOW = 300;
 
     private final FieldAsyncTaskListener listener;
     private final Canvas canvas;
@@ -99,10 +100,12 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
 
     @Override
     protected Canvas doInBackground(Double... params) {
-        try {
-            Thread.sleep(startDelay);
-        } catch (InterruptedException e) {
-            // Ignore.
+        if (startDelay > 0) {
+            try {
+                Thread.sleep(startDelay);
+            } catch (InterruptedException e) {
+                // Ignore.
+            }
         }
         if (params.length >= 2) {
             scrollX = params[0];
@@ -197,8 +200,8 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
      * http://en.wikipedia.org/wiki/Mandelbrot_set
      */
     private void plotMandelbrot(Canvas canvas, int x, int y, int w, int h, double size, double density) {
-        double kRe = ((((x) + scrollX) / size) + SET_MIN) / zoom;
-        double kIm = ((((y) + scrollY) / size) + SET_MIN) / zoom;
+        double kRe = (((x + scrollX) / size) + SET_MIN) / zoom;
+        double kIm = (((y + scrollY) / size) + SET_MIN) / zoom;
         double zRe = 0;
         double zIm = 0;
         double zReSrq = 0;
@@ -206,7 +209,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         double d;
         double r;
         int i = 0;
-        boolean underflow = true;
+        boolean underflow;
 
         do {
             r = zReSrq - zImSrq + kRe;
@@ -216,7 +219,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
             zImSrq = zIm * zIm;
             d = zReSrq + zImSrq;
             i++;
-            underflow = i < 1000;
+            underflow = i < OVERFLOW;
         } while (underflow && (d < 9));
 
         double z = i;
@@ -230,7 +233,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
     }
 
     private int mapColor(double c, double density) {
-        if (c == 0) {
+        if (c == OVERFLOW) {
             return Color.BLACK;
         }
         hsv[0] = (float) ((c * density) % 360);
