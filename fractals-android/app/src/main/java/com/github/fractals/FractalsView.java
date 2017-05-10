@@ -79,7 +79,14 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawBitmap(getBitmap(), 0, 0, null);
+
+        int width = getWidth();
+        int height = getHeight();
+        Bitmap bitmap = getBitmap();
+        int bitmapWidth = bitmap.getWidth();
+        int bitmapHeight = bitmap.getHeight();
+        canvas.translate((width - bitmapWidth) / 2, (height - bitmapHeight) / 2);
+        canvas.drawBitmap(bitmap, 0, 0, null);
     }
 
     /**
@@ -144,13 +151,9 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
      * @return the bitmap.
      */
     public Bitmap getBitmap() {
-        int width = getWidth();//!@# TODO DELETE ME!
-        int height = getHeight();//!@# TODO DELETE ME!
-        if ((width == 0) || (height == 0)) {
-            DisplayMetrics metrics = getResources().getDisplayMetrics();
-            width = metrics.widthPixels;
-            height = metrics.heightPixels;
-        }
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        int width = metrics.widthPixels;
+        int height = metrics.heightPixels;
 
         Bitmap bitmapOld = bitmap;
         if (bitmapOld != null) {
@@ -167,13 +170,9 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
                 }
                 Bitmap rotated = Bitmap.createBitmap(bitmapOld, 0, 0, bw, bh, m, true);
                 bitmap = Bitmap.createScaledBitmap(rotated, width, height, true);
-                setPivotX(width / 2);
-                setPivotY(height / 2);
             }
         } else {
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            setPivotX(width / 2);
-            setPivotY(height / 2);
         }
         return bitmap;
     }

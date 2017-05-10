@@ -60,7 +60,6 @@ public class MainActivity extends Activity implements
     private float zoomViewing = 1f;
     private boolean scrolling;
     private boolean scaling;
-    private final float[] matrixValues = new float[9];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -188,24 +187,9 @@ public class MainActivity extends Activity implements
     public void onScaleEnd(ScaleGestureDetector detector) {
         float zoomView = fractalsView.getZoom();
         float zoom = zoomView * zoomViewing;
-        float width = fractalsView.getWidth();
-        float height = fractalsView.getHeight();
-        float midX = width / 2;
-        float midY = height / 2;
-        float transXExpected = midX * (1 - zoomViewing);
-        float transYExpected = midY * (1 - zoomViewing);
-
-        // Scaling forces the corners beyond the visible rect.
-        fractalsView.getMatrix().getValues(matrixValues);
-        float transX = matrixValues[Matrix.MTRANS_X];
-        float transY = matrixValues[Matrix.MTRANS_Y];
-        float dx = (transXExpected - transX);
-        float dy = (transYExpected - transY);
 
         float scrollX = fractalsView.getScrollXF() / zoomView;
         float scrollY = fractalsView.getScrollYF() / zoomView;
-        scrollX += dx;
-        scrollY += dy;
         fractalsView.setScroll(scrollX * zoom, scrollY * zoom);
 
         fractalsView.setScaleX(1);
