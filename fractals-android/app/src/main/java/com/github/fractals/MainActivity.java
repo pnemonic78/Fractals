@@ -188,9 +188,9 @@ public class MainActivity extends Activity implements
         float zoomView = fractalsView.getZoom();
         float zoom = zoomView * zoomViewing;
 
-        float scrollX = fractalsView.getScrollXF() / zoomView;
-        float scrollY = fractalsView.getScrollYF() / zoomView;
-        fractalsView.setScroll(scrollX * zoom, scrollY * zoom);
+        float scrollX = fractalsView.getScrollXF() * zoomViewing;
+        float scrollY = fractalsView.getScrollYF() * zoomViewing;
+        fractalsView.setScroll(scrollX, scrollY);
 
         fractalsView.setScaleX(1);
         fractalsView.setScaleY(1);
