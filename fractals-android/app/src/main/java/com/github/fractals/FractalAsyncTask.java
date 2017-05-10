@@ -60,7 +60,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         void repaint(FractalAsyncTask task);
     }
 
-    private static final double SET_MIN = -2.5;
+    private static final double SET_MIN = -1;//-2.5;
     private static final double SET_MAX = 1;
     private static final double SET_SIZE = SET_MAX - SET_MIN;
 
@@ -114,6 +114,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
                 zoom = params[2];
             }
         }
+        System.out.println("!@# exe " + scrollX + "," + scrollY + " " + zoom);
 
         int w = canvas.getWidth();
         int h = canvas.getHeight();
@@ -225,6 +226,8 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         double z = i;
         if (underflow) {
             z += 1 - (Math.log(Math.log(d) / LOG2_2) / LOG2);
+        } else {
+            z = 0;
         }
 
         paint.setColor(mapColor(z, density));
@@ -233,7 +236,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
     }
 
     private int mapColor(double c, double density) {
-        if (c == OVERFLOW) {
+        if (c == 0) {
             return Color.BLACK;
         }
         hsv[0] = (float) ((c * density) % 360);

@@ -35,6 +35,23 @@ import android.view.View;
  */
 public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTaskListener {
 
+    /**
+     * Make the fractal appear to be shifted in the leftward direction.
+     */
+    public static final float LEFT = +1;
+    /**
+     * Make the fractal appear to be shifted in the upwrd direction.
+     */
+    public static final float UP = +1;
+    /**
+     * Make the fractal appear to be shifted in the rightward direction.
+     */
+    public static final float RIGHT = -1;
+    /**
+     * Make the fractal appear to be shifted in the downward direction.
+     */
+    public static final float DOWN = -1;
+
     private Bitmap bitmap;
     private FractalAsyncTask task;
     private FractalsListener listener;
@@ -55,9 +72,8 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
     }
 
     public void clear() {
-        scrollX = 0;
-        scrollY = 0;
-        zoom = 1;
+        setScroll(0, 0);
+        setZoom(1);
     }
 
     @Override
@@ -107,7 +123,6 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
             if (listener != null) {
                 listener.onRenderFieldFinished(this);
             }
-            clear();
         }
     }
 
@@ -129,9 +144,13 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
      * @return the bitmap.
      */
     public Bitmap getBitmap() {
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        int width = metrics.widthPixels;
-        int height = metrics.heightPixels;
+        int width = getWidth();
+        int height = getHeight();
+        if ((width == 0) || (height == 0)) {
+            DisplayMetrics metrics = getResources().getDisplayMetrics();
+            width = metrics.widthPixels;
+            height = metrics.heightPixels;
+        }
 
         Bitmap bitmapOld = bitmap;
         if (bitmapOld != null) {
@@ -187,9 +206,8 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
 
         if (ss.zoom != 0) {
             clear();
-            scrollX = ss.scrollX;
-            scrollY = ss.scrollY;
-            zoom = ss.zoom;
+            setScroll(ss.scrollX, ss.scrollY);
+            setZoom(ss.zoom);
             restart();
         }
     }
@@ -204,23 +222,44 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
     }
 
     /**
-     * Set the scrolling offsets.
+     * Set the scrolling offsets. Parameter values should already be scaled to the zoom.
      *
-     * @param scrollX the horizontal offset.
-     * @param scrollY the vertical offset.
+     * @param scrollX The horizontal offset. Positive values make the image appear to move leftwards.
+     * @param scrollY The vertical offset. Positive values make the image appear to move upwards.
+     * @see #LEFT
+     * @see #RIGHT
+     * @see #UP
+     * @see #DOWN
      */
     public void setScroll(float scrollX, float scrollY) {
         this.scrollX = scrollX;
         this.scrollY = scrollY;
     }
 
+    public float getScrollXF() {
+        return scrollX;
+    }
+
+    public float getScrollYF() {
+        return scrollY;
+    }
+
     /**
      * Set the zoom scale factor.
      *
-     * @param zoom the zoom.
+     * @param zoom The zoom.
      */
     public void setZoom(float zoom) {
         this.zoom = zoom;
+    }
+
+    /**
+     * Get the zoom scale factor.
+     *
+     * @return The zoom.
+     */
+    public float getZoom() {
+        return zoom;
     }
 
     public static class SavedState extends BaseSavedState {
@@ -257,5 +296,24 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
                 return new SavedState[size];
             }
         };
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        bitmap = null;
+        if (task != null) {
+            restart();
+        }
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        int width = MeasureSpec.getSize(widthMeasureSpec);
+        int height = MeasureSpec.getSize(heightMeasureSpec);
+        int size = Math.min(width, height);
+        setMeasuredDimension(size, size);// Force square ratio.
     }
 }
