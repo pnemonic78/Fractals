@@ -60,7 +60,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         void repaint(FractalAsyncTask task);
     }
 
-    private static final double SET_MIN = -1;//-2.5;
+    private static final double SET_MIN = -1;//!@# -2.5;
     private static final double SET_MAX = 1;
     private static final double SET_SIZE = SET_MAX - SET_MIN;
 
@@ -114,7 +114,6 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
                 zoom = params[2];
             }
         }
-        System.out.println("!@# exe " + scrollX + "," + scrollY + " " + zoom);
 
         int w = canvas.getWidth();
         int h = canvas.getHeight();

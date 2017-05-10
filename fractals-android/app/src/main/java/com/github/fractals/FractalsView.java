@@ -144,8 +144,8 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
      * @return the bitmap.
      */
     public Bitmap getBitmap() {
-        int width = getWidth();
-        int height = getHeight();
+        int width = getWidth();//!@# TODO DELETE ME!
+        int height = getHeight();//!@# TODO DELETE ME!
         if ((width == 0) || (height == 0)) {
             DisplayMetrics metrics = getResources().getDisplayMetrics();
             width = metrics.widthPixels;
@@ -167,9 +167,13 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
                 }
                 Bitmap rotated = Bitmap.createBitmap(bitmapOld, 0, 0, bw, bh, m, true);
                 bitmap = Bitmap.createScaledBitmap(rotated, width, height, true);
+                setPivotX(width / 2);
+                setPivotY(height / 2);
             }
         } else {
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            setPivotX(width / 2);
+            setPivotY(height / 2);
         }
         return bitmap;
     }
@@ -314,6 +318,7 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
         int size = Math.min(width, height);
+        //!@# TODO DELETE ME!
         setMeasuredDimension(size, size);// Force square ratio.
     }
 }
