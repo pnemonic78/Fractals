@@ -310,15 +310,4 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
             restart();
         }
     }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-        int width = MeasureSpec.getSize(widthMeasureSpec);
-        int height = MeasureSpec.getSize(heightMeasureSpec);
-        int size = Math.min(width, height);
-        //!@# TODO DELETE ME!
-        setMeasuredDimension(size, size);// Force square ratio.
-    }
 }
