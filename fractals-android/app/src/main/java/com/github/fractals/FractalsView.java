@@ -35,6 +35,23 @@ import android.view.View;
  */
 public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTaskListener {
 
+    /**
+     * Make the fractal appear to be shifted in the leftward direction.
+     */
+    public static final float LEFT = +1;
+    /**
+     * Make the fractal appear to be shifted in the upwrd direction.
+     */
+    public static final float UP = +1;
+    /**
+     * Make the fractal appear to be shifted in the rightward direction.
+     */
+    public static final float RIGHT = -1;
+    /**
+     * Make the fractal appear to be shifted in the downward direction.
+     */
+    public static final float DOWN = -1;
+
     private Bitmap bitmap;
     private FractalAsyncTask task;
     private FractalsListener listener;
@@ -55,9 +72,8 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
     }
 
     public void clear() {
-        scrollX = 0;
-        scrollY = 0;
-        zoom = 1;
+        setScroll(0, 0);
+        setZoom(1);
     }
 
     @Override
@@ -110,7 +126,6 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
             if (listener != null) {
                 listener.onRenderFieldFinished(this);
             }
-            clear();
         }
     }
 
@@ -190,9 +205,8 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
 
         if (ss.zoom != 0) {
             clear();
-            scrollX = ss.scrollX;
-            scrollY = ss.scrollY;
-            zoom = ss.zoom;
+            setScroll(ss.scrollX, ss.scrollY);
+            setZoom(ss.zoom);
             restart();
         }
     }
@@ -207,23 +221,44 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
     }
 
     /**
-     * Set the scrolling offsets.
+     * Set the scrolling offsets. Parameter values should already be scaled to the zoom.
      *
-     * @param scrollX the horizontal offset.
-     * @param scrollY the vertical offset.
+     * @param scrollX The horizontal offset. Positive values make the image appear to move leftwards.
+     * @param scrollY The vertical offset. Positive values make the image appear to move upwards.
+     * @see #LEFT
+     * @see #RIGHT
+     * @see #UP
+     * @see #DOWN
      */
     public void setScroll(float scrollX, float scrollY) {
         this.scrollX = scrollX;
         this.scrollY = scrollY;
     }
 
+    public float getScrollXF() {
+        return scrollX;
+    }
+
+    public float getScrollYF() {
+        return scrollY;
+    }
+
     /**
      * Set the zoom scale factor.
      *
-     * @param zoom the zoom.
+     * @param zoom The zoom.
      */
     public void setZoom(float zoom) {
         this.zoom = zoom;
+    }
+
+    /**
+     * Get the zoom scale factor.
+     *
+     * @return The zoom.
+     */
+    public float getZoom() {
+        return zoom;
     }
 
     public static class SavedState extends BaseSavedState {

@@ -70,6 +70,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
     private static final double LOG2 = Math.log(2);
     private static final double LOG2_LOG2 = Math.log(LOG2) / LOG2;
     private static final double LOG2_LOG2_2 = 2 + LOG2_LOG2;
+    private static final int OVERFLOW = 300;
 
     private final FieldAsyncTaskListener listener;
     private final Canvas canvas;
@@ -229,7 +230,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
             zImSrq = zIm * zIm;
             d = zReSrq + zImSrq;
             i++;
-            underflow = i < 100;
+            underflow = i < OVERFLOW;
         } while (underflow && (d < 9));
 
         double z = i;

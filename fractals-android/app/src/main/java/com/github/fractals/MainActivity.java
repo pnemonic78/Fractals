@@ -22,6 +22,7 @@ import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.graphics.Matrix;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -55,12 +56,10 @@ public class MainActivity extends Activity implements
     private ScaleGestureDetector scaleGestureDetector;
     private AsyncTask saveTask;
     private MenuItem menuStop;
-    private float zoom = 1f;
-    private float scrollX, scrollY;
     private float scrollXViewing, scrollYViewing;
     private float zoomViewing = 1f;
     private boolean scrolling;
-    private final float[] matrixValues = new float[9];
+    private boolean scaling;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +89,9 @@ public class MainActivity extends Activity implements
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_CANCEL:
                 case MotionEvent.ACTION_UP:
-                    onScrollFinished();
+                    if (scrolling) {
+                        onScrollEnd();
+                    }
                     break;
             }
 
@@ -115,24 +116,25 @@ public class MainActivity extends Activity implements
 
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        if (scaling) {
+            return false;
+        }
         scrolling = true;
-//        scrollX += distanceX;
-//        scrollY += distanceY;
-//        scrollXViewing += distanceX;
-//        scrollYViewing += distanceY;
-//        fractalsView.scrollTo((int) scrollXViewing, (int) scrollYViewing);
-//        return true;
-        return false;
+        scrollXViewing += distanceX;
+        scrollYViewing += distanceY;
+        fractalsView.scrollTo((int) scrollXViewing, (int) scrollYViewing);
+        return true;
     }
 
-    private void onScrollFinished() {
-        if (scrolling) {
-            scrolling = false;
-//            fractalsView.cancel();
-//            fractalsView.setScroll(scrollX, scrollY);
-//            fractalsView.scrollTo(0, 0);
-//            fractalsView.start();
+    private void onScrollEnd() {
+        scrolling = false;
+        if (scaling) {
+            return;
         }
+        fractalsView.cancel();
+        fractalsView.scrollTo(0, 0);
+        fractalsView.setScroll(fractalsView.getScrollXF() + scrollXViewing, fractalsView.getScrollYF() + scrollYViewing);
+        fractalsView.start();
         scrollXViewing = 0;
         scrollYViewing = 0;
     }
@@ -163,34 +165,39 @@ public class MainActivity extends Activity implements
 
     @Override
     public boolean onScaleBegin(ScaleGestureDetector detector) {
+        if (scrolling) {
+            return false;
+        }
+        scaling = true;
         zoomViewing = 1f;
+        fractalsView.setScaleX(zoomViewing);
+        fractalsView.setScaleY(zoomViewing);
         return true;
     }
 
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
         zoomViewing *= detector.getScaleFactor();
-//        fractalsView.setScaleX(zoomViewing);
-//        fractalsView.setScaleY(zoomViewing);
+        fractalsView.setScaleX(zoomViewing);
+        fractalsView.setScaleY(zoomViewing);
         return true;
     }
 
     @Override
     public void onScaleEnd(ScaleGestureDetector detector) {
-//        fractalsView.cancel();
-//
-//        zoom *= zoomViewing;
-//        fractalsView.setZoom(zoom);
-//
-//        //scaling forces the corners beyond the visible rect.
-//        fractalsView.getMatrix().getValues(matrixValues);
-//        scrollX -= matrixValues[2] / zoomViewing;
-//        scrollY -= matrixValues[5] / zoomViewing;
-//        fractalsView.setScroll(scrollX, scrollY);
-//
-//        fractalsView.setScaleX(1);
-//        fractalsView.setScaleY(1);
-//        fractalsView.start();
+        float zoomView = fractalsView.getZoom();
+        float zoom = zoomView * zoomViewing;
+
+        float scrollX = fractalsView.getScrollXF() * zoomViewing;
+        float scrollY = fractalsView.getScrollYF() * zoomViewing;
+        fractalsView.setScroll(scrollX, scrollY);
+
+        fractalsView.setScaleX(1);
+        fractalsView.setScaleY(1);
+        fractalsView.setZoom(zoom);
+
+        fractalsView.restart();
+        scaling = false;
     }
 
     @Override
