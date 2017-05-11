@@ -60,10 +60,10 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         void repaint(FractalAsyncTask task);
     }
 
-    private static final double RE_MIN = -2.1;
-    private static final double RE_MAX = 1;
+    private static final double RE_MIN = -2;
+    private static final double RE_MAX = -RE_MIN;//!@# 1;
     private static final double RE_SIZE = RE_MAX - RE_MIN;
-    private static final double IM_MIN = -1.2;
+    private static final double IM_MIN = RE_MIN;//!@# -1.2;
     private static final double IM_MAX = -IM_MIN;
     private static final double IM_SIZE = IM_MAX - IM_MIN;
 
@@ -127,8 +127,8 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
         double sizeIm = (h >= w) ? sizeMin * IM_SIZE / RE_SIZE : sizeMin;
         double sizeSetRe = sizeRe / RE_SIZE;
         double sizeSetIm = sizeIm / IM_SIZE;
-        double offsetRe = (w - sizeRe) / 2;
-        double offsetIm = (h - sizeIm) / 2;
+        double offsetRe = scrollX + Math.min(0, ((sizeRe - w) / 2));
+        double offsetIm = scrollY + Math.min(0, ((sizeIm - h) / 2));
 
         int shifts = 0;
         while (sizeMax > 1) {
@@ -211,8 +211,8 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
      * http://en.wikipedia.org/wiki/Mandelbrot_set
      */
     private void plotMandelbrot(Canvas canvas, int x, int y, int w, int h, double sizeRe, double sizeIm, double offsetRe, double offsetIm, double density) {
-        double kRe = (((x - offsetRe) / sizeRe) + RE_MIN) / zoom;
-        double kIm = (((y - offsetIm) / sizeIm) + IM_MIN) / zoom;
+        double kRe = (((x + offsetRe) / sizeRe) + RE_MIN) / zoom;
+        double kIm = (((y + offsetIm) / sizeIm) + IM_MIN) / zoom;
         double zRe = 0;
         double zIm = 0;
         double zReSrq = 0;
