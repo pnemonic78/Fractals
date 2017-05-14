@@ -133,7 +133,8 @@ public class MainActivity extends Activity implements
         }
         fractalsView.cancel();
         fractalsView.scrollTo(0, 0);
-        fractalsView.setScroll(fractalsView.getScrollXF() + scrollXViewing, fractalsView.getScrollYF() + scrollYViewing);
+        Matrix matrix = fractalsView.getBitmapMatrix();
+        matrix.postTranslate(scrollXViewing, scrollYViewing);
         fractalsView.start();
         scrollXViewing = 0;
         scrollYViewing = 0;
@@ -185,16 +186,10 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onScaleEnd(ScaleGestureDetector detector) {
-        float zoomView = fractalsView.getZoom();
-        float zoom = zoomView * zoomViewing;
-
-        float scrollX = fractalsView.getScrollXF() * zoomViewing;
-        float scrollY = fractalsView.getScrollYF() * zoomViewing;
-        fractalsView.setScroll(scrollX, scrollY);
-
         fractalsView.setScaleX(1);
         fractalsView.setScaleY(1);
-        fractalsView.setZoom(zoom);
+        Matrix matrix = fractalsView.getBitmapMatrix();
+        matrix.postScale(zoomViewing, zoomViewing);
 
         fractalsView.restart();
         scaling = false;

@@ -19,6 +19,7 @@ package com.github.fractals;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.AsyncTask;
@@ -28,7 +29,7 @@ import android.os.AsyncTask;
  *
  * @author Moshe Waisberg
  */
-public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
+public class FractalAsyncTask extends AsyncTask<Matrix, Canvas, Canvas> {
 
     public interface FieldAsyncTaskListener {
         /**
@@ -103,7 +104,7 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
     }
 
     @Override
-    protected Canvas doInBackground(Double... params) {
+    protected Canvas doInBackground(Matrix... params) {
         if (startDelay > 0L) {
             try {
                 Thread.sleep(startDelay);
@@ -111,12 +112,13 @@ public class FractalAsyncTask extends AsyncTask<Double, Canvas, Canvas> {
                 // Ignore.
             }
         }
-        if (params.length >= 2) {
-            scrollX = params[0];
-            scrollY = params[1];
-            if (params.length >= 3) {
-                zoom = params[2];
-            }
+        if (params.length >= 1) {
+            Matrix matrix = params[0];
+            float[] matrixValues = new float[9];
+            matrix.getValues(matrixValues);
+            scrollX = matrixValues[Matrix.MTRANS_X];
+            scrollY = matrixValues[Matrix.MTRANS_Y];
+            zoom = matrixValues[Matrix.MSCALE_X];
         }
 
         int w = canvas.getWidth();

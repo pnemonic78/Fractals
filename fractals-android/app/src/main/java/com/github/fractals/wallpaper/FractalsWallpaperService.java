@@ -19,6 +19,7 @@ package com.github.fractals.wallpaper;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.service.wallpaper.WallpaperService;
 import android.text.format.DateUtils;
 import android.view.GestureDetector;
@@ -123,8 +124,9 @@ public class FractalsWallpaperService extends WallpaperService {
             float x = (random.nextBoolean() ? +0.25f : -0.25f) * random.nextFloat() * fieldsView.getWidth();
             float y = (random.nextBoolean() ? +0.25f : -0.25f) * random.nextFloat() * fieldsView.getHeight();
             float z = Math.max(0.25f, random.nextFloat() * 5);
-            fieldsView.setScroll(x, y);
-            fieldsView.setZoom(z);
+            Matrix matrix = fieldsView.getBitmapMatrix();
+            matrix.preTranslate(x, y);
+            matrix.postScale(z, z);
             fieldsView.restart(delay);
         }
 

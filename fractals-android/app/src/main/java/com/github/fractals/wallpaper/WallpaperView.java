@@ -36,18 +36,14 @@ public class WallpaperView implements FractalAsyncTask.FieldAsyncTaskListener {
     private Bitmap bitmap;
     private FractalAsyncTask task;
     private WallpaperListener listener;
-    private float scrollX = 0;
-    private float scrollY = 0;
-    private float zoom = 1;
+    private final Matrix matrix = new Matrix();
 
     public WallpaperView(Context context, WallpaperListener listener) {
         setWallpaperListener(listener);
     }
 
     public void clear() {
-        scrollX = 0;
-        scrollY = 0;
-        zoom = 1;
+        matrix.reset();
     }
 
     public void draw(Canvas canvas) {
@@ -76,7 +72,7 @@ public class WallpaperView implements FractalAsyncTask.FieldAsyncTaskListener {
             task.setSaturation(0.5f);
             task.setBrightness(0.5f);
             task.setStartDelay(delay);
-            task.execute((double) scrollX, (double) scrollY, (double) zoom);
+            task.execute(matrix);
         }
     }
 
@@ -194,22 +190,11 @@ public class WallpaperView implements FractalAsyncTask.FieldAsyncTaskListener {
     }
 
     /**
-     * Set the scrolling offsets.
+     * Get the matrix for rendering the bitmap.
      *
-     * @param scrollX the horizontal offset.
-     * @param scrollY the vertical offset.
+     * @return the matrix for the bitmap.
      */
-    public void setScroll(float scrollX, float scrollY) {
-        this.scrollX = scrollX;
-        this.scrollY = scrollY;
-    }
-
-    /**
-     * Set the zoom scale factor.
-     *
-     * @param zoom the zoom.
-     */
-    public void setZoom(float zoom) {
-        this.zoom = zoom;
+    public Matrix getBitmapMatrix() {
+        return matrix;
     }
 }
