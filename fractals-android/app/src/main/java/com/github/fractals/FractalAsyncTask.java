@@ -23,6 +23,8 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.AsyncTask;
+import android.os.SystemClock;
+import android.util.Log;
 
 /**
  * Fractals task.
@@ -30,6 +32,8 @@ import android.os.AsyncTask;
  * @author Moshe Waisberg
  */
 public class FractalAsyncTask extends AsyncTask<Matrix, Canvas, Canvas> {
+
+    private static final String TAG = "FractalAsyncTask";
 
     public interface FieldAsyncTaskListener {
         /**
@@ -82,6 +86,8 @@ public class FractalAsyncTask extends AsyncTask<Matrix, Canvas, Canvas> {
     private double zoom = 1;
     private double scrollX = 0;
     private double scrollY = 0;
+    private double minReZoomed = 0;
+    private double minImZoomed = 0;
 
     public FractalAsyncTask(FieldAsyncTaskListener listener, Canvas canvas) {
         this.listener = listener;
@@ -112,6 +118,7 @@ public class FractalAsyncTask extends AsyncTask<Matrix, Canvas, Canvas> {
                 // Ignore.
             }
         }
+        final long timeStart = SystemClock.elapsedRealtime();
         if (params.length >= 1) {
             Matrix matrix = params[0];
             float[] matrixValues = new float[9];
@@ -127,10 +134,12 @@ public class FractalAsyncTask extends AsyncTask<Matrix, Canvas, Canvas> {
         int sizeMin = Math.min(w, h);
         double sizeRe = (h >= w) ? sizeMin : sizeMin * RE_SIZE / IM_SIZE;
         double sizeIm = (h >= w) ? sizeMin * IM_SIZE / RE_SIZE : sizeMin;
-        double sizeSetRe = sizeRe / RE_SIZE;
-        double sizeSetIm = sizeIm / IM_SIZE;
+        double sizeSetRe = (sizeRe / RE_SIZE) * zoom;
+        double sizeSetIm = (sizeIm / IM_SIZE) * zoom;
         double offsetRe = scrollX + Math.min(0, ((sizeRe - w) / 2));
         double offsetIm = scrollY + Math.min(0, ((sizeIm - h) / 2));
+        minReZoomed = RE_MIN / zoom;
+        minImZoomed = IM_MIN / zoom;
 
         int shifts = 0;
         while (sizeMax > 1) {
@@ -193,6 +202,9 @@ public class FractalAsyncTask extends AsyncTask<Matrix, Canvas, Canvas> {
             }
         } while (resolution >= 1);
 
+        final long timeEnd = SystemClock.elapsedRealtime();
+        Log.v(TAG, "Rendered in " + (timeEnd - timeStart) + "ms");
+
         return canvas;
     }
 
@@ -222,8 +234,8 @@ public class FractalAsyncTask extends AsyncTask<Matrix, Canvas, Canvas> {
      * http://en.wikipedia.org/wiki/Mandelbrot_set
      */
     private void plotMandelbrot(Canvas canvas, int x, int y, int w, int h, double xRe, double yIm, double sizeRe, double sizeIm, double density) {
-        double kRe = ((xRe / sizeRe) + RE_MIN) / zoom;
-        double kIm = ((yIm / sizeIm) + IM_MIN) / zoom;
+        double kRe = (xRe / sizeRe) + minReZoomed;
+        double kIm = (yIm / sizeIm) + minImZoomed;
         double zRe = 0;
         double zIm = 0;
         double zReSrq = 0;
