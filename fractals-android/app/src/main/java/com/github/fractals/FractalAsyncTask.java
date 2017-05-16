@@ -134,8 +134,8 @@ public class FractalAsyncTask extends AsyncTask<Matrix, Canvas, Canvas> {
         int sizeMin = Math.min(w, h);
         double sizeRe = (h >= w) ? sizeMin : sizeMin * RE_SIZE / IM_SIZE;
         double sizeIm = (h >= w) ? sizeMin * IM_SIZE / RE_SIZE : sizeMin;
-        double sizeSetRe = (sizeRe / RE_SIZE) * zoom;
-        double sizeSetIm = (sizeIm / IM_SIZE) * zoom;
+        double sizeSetRe = sizeRe * zoom / RE_SIZE;
+        double sizeSetIm = sizeIm * zoom / IM_SIZE;
         double offsetRe = scrollX + Math.min(0, ((sizeRe - w) / 2));
         double offsetIm = scrollY + Math.min(0, ((sizeIm - h) / 2));
         minReZoomed = RE_MIN / zoom;
