@@ -36,7 +36,7 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
     private Bitmap bitmap;
     private FractalAsyncTask task;
     private FractalsListener listener;
-    private final Matrix matrix = new Matrix();
+    private final Matrix bitmapMatrix = new Matrix();
 
     public FractalsView(Context context) {
         super(context);
@@ -51,7 +51,7 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
     }
 
     public void clear() {
-        matrix.reset();
+        bitmapMatrix.reset();
     }
 
     @Override
@@ -69,7 +69,7 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
     public void start() {
         if (!isRendering()) {
             task = new FractalAsyncTask(this, new Canvas(getBitmap()));
-            task.execute(matrix);
+            task.execute(bitmapMatrix);
         }
     }
 
@@ -203,7 +203,7 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
      * @return the matrix for the bitmap.
      */
     public Matrix getBitmapMatrix() {
-        return matrix;
+        return bitmapMatrix;
     }
 
     public static class SavedState extends BaseSavedState {
