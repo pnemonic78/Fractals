@@ -158,6 +158,6 @@ public class SaveFileTask extends AsyncTask<Bitmap, File, File> {
     }
 
     protected String generateFileName() {
-        return "ef-" + timestampFormat.format(new Date()) + ".png";
+        return "fractal-" + timestampFormat.format(new Date()) + ".png";
     }
 }
