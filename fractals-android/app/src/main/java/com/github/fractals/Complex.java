@@ -38,6 +38,14 @@ public class Complex {
         return imaginary;
     }
 
+    public void setReal(double real) {
+        this.real = real;
+    }
+
+    public void setImaginary(double imaginary) {
+        this.imaginary = imaginary;
+    }
+
     public void set(double real, double imaginary) {
         this.real = real;
         this.imaginary = imaginary;
