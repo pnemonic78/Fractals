@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.fractals;
+package com.github.fractals
 
 /**
  * Fractals event listener.
- *
  * @author Moshe Waisberg
  */
-public interface FractalsListener {
+interface FractalsListener {
 
-    void onRenderFieldZoom(FractalsView view, double scale);
+    fun onRenderFieldZoom(view: FractalsView, scale: Double)
 
-    void onRenderFieldPan(FractalsView view, int dx, int dy);
+    fun onRenderFieldPan(view: FractalsView, dx: Int, dy: Int)
 
-    void onRenderFieldStarted(FractalsView view);
+    fun onRenderFieldStarted(view: FractalsView)
 
-    void onRenderFieldFinished(FractalsView view);
+    fun onRenderFieldFinished(view: FractalsView)
 
-    void onRenderFieldCancelled(FractalsView view);
+    fun onRenderFieldCancelled(view: FractalsView)
 }
