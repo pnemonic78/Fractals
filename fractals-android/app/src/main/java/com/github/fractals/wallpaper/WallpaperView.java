@@ -158,9 +158,9 @@ public class WallpaperView implements FractalAsyncTask.FieldAsyncTaskListener {
                 Matrix m = new Matrix();
                 // Changed orientation?
                 if ((width < bw) && (height > bh)) {// Portrait?
-                    m.postRotate(90, bw / 2, bh / 2);
+                    m.postRotate(90f, bw / 2f, bh / 2f);
                 } else {// Landscape?
-                    m.postRotate(270, bw / 2, bh / 2);
+                    m.postRotate(270f, bw / 2f, bh / 2f);
                 }
                 Bitmap rotated = Bitmap.createBitmap(bitmapOld, 0, 0, bw, bh, m, true);
                 bitmap = Bitmap.createScaledBitmap(rotated, width, height, true);

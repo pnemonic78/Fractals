@@ -51,7 +51,7 @@ public class FractalsWallpaperService extends WallpaperService {
         /**
          * Enough time for user to admire the wallpaper before starting the next rendition.
          */
-        private static final long DELAY = 10 * DateUtils.SECOND_IN_MILLIS;
+        private static final long DELAY = 10L * DateUtils.SECOND_IN_MILLIS;
 
         private WallpaperView fieldsView;
         private GestureDetector gestureDetector;
@@ -121,7 +121,7 @@ public class FractalsWallpaperService extends WallpaperService {
             fieldsView.clear();
             float x = (random.nextBoolean() ? +0.25f : -0.25f) * random.nextFloat() * fieldsView.getWidth();
             float y = (random.nextBoolean() ? +0.25f : -0.25f) * random.nextFloat() * fieldsView.getHeight();
-            float z = Math.max(0.25f, random.nextFloat() * 5);
+            float z = Math.max(0.25f, random.nextFloat() * 5f);
             Matrix matrix = fieldsView.getBitmapMatrix();
             matrix.preTranslate(x, y);
             matrix.postScale(z, z);
@@ -171,26 +171,18 @@ public class FractalsWallpaperService extends WallpaperService {
         }
 
         @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            return false;
+        }
+
+        @Override
+        public boolean onDoubleTapEvent(MotionEvent e) {
+            return false;
+        }
+
+        @Override
         public boolean onDown(MotionEvent e) {
             return false;
-        }
-
-        @Override
-        public void onShowPress(MotionEvent e) {
-        }
-
-        @Override
-        public boolean onSingleTapUp(MotionEvent e) {
-            return false;
-        }
-
-        @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            return false;
-        }
-
-        @Override
-        public void onLongPress(MotionEvent e) {
         }
 
         @Override
@@ -199,17 +191,25 @@ public class FractalsWallpaperService extends WallpaperService {
         }
 
         @Override
+        public void onLongPress(MotionEvent e) {
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            return false;
+        }
+
+        @Override
+        public void onShowPress(MotionEvent e) {
+        }
+
+        @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
             return false;
         }
 
         @Override
-        public boolean onDoubleTap(MotionEvent e) {
-            return false;
-        }
-
-        @Override
-        public boolean onDoubleTapEvent(MotionEvent e) {
+        public boolean onSingleTapUp(MotionEvent e) {
             return false;
         }
     }

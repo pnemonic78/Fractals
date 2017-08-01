@@ -45,8 +45,6 @@ public class MainActivity extends Activity implements
         ScaleGestureDetector.OnScaleGestureListener,
         FractalsListener {
 
-    private static final String TAG = "MainActivity";
-
     private static final int REQUEST_SAVE = 1;
 
     private FractalsView fractalsView;
@@ -99,6 +97,16 @@ public class MainActivity extends Activity implements
     }
 
     @Override
+    public boolean onDoubleTap(MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public boolean onDoubleTapEvent(MotionEvent e) {
+        return false;
+    }
+
+    @Override
     public boolean onDown(MotionEvent e) {
         return false;
     }
@@ -110,56 +118,6 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onLongPress(MotionEvent e) {
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        if (scaling) {
-            return false;
-        }
-        scrolling = true;
-        scrollXViewing += distanceX;
-        scrollYViewing += distanceY;
-        fractalsView.scrollTo((int) scrollXViewing, (int) scrollYViewing);
-        return true;
-    }
-
-    private void onScrollEnd() {
-        scrolling = false;
-        if (scaling) {
-            return;
-        }
-        fractalsView.cancel();
-        fractalsView.scrollTo(0, 0);
-        Matrix matrix = fractalsView.getBitmapMatrix();
-        matrix.postTranslate(scrollXViewing, scrollYViewing);
-        fractalsView.start();
-        scrollXViewing = 0;
-        scrollYViewing = 0;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent e) {
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public boolean onDoubleTap(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public boolean onDoubleTapEvent(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public boolean onSingleTapConfirmed(MotionEvent e) {
-        return false;
     }
 
     @Override
@@ -184,13 +142,53 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onScaleEnd(ScaleGestureDetector detector) {
-        fractalsView.setScaleX(1);
-        fractalsView.setScaleY(1);
+        fractalsView.setScaleX(1f);
+        fractalsView.setScaleY(1f);
         Matrix matrix = fractalsView.getBitmapMatrix();
         matrix.postScale(zoomViewing, zoomViewing);
 
         fractalsView.restart();
         scaling = false;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        if (scaling) {
+            return false;
+        }
+        scrolling = true;
+        scrollXViewing += distanceX;
+        scrollYViewing += distanceY;
+        fractalsView.scrollTo((int) scrollXViewing, (int) scrollYViewing);
+        return true;
+    }
+
+    private void onScrollEnd() {
+        scrolling = false;
+        if (scaling) {
+            return;
+        }
+        fractalsView.cancel();
+        fractalsView.scrollTo(0, 0);
+        Matrix matrix = fractalsView.getBitmapMatrix();
+        matrix.postTranslate(scrollXViewing, scrollYViewing);
+        fractalsView.start();
+        scrollXViewing = 0f;
+        scrollYViewing = 0f;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent e) {
+    }
+
+    @Override
+    public boolean onSingleTapConfirmed(MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
+        return false;
     }
 
     @Override

@@ -63,16 +63,16 @@ public class FractalAsyncTask extends AsyncTask<Matrix, Canvas, Canvas> {
         void repaint(FractalAsyncTask task);
     }
 
-    private static final double RE_MIN = -2;
-    private static final double RE_MAX = -RE_MIN;//!@# 1;
+    private static final double RE_MIN = -2.0;
+    private static final double RE_MAX = -RE_MIN;
     private static final double RE_SIZE = RE_MAX - RE_MIN;
-    private static final double IM_MIN = RE_MIN;//!@# -1.2;
+    private static final double IM_MIN = RE_MIN;
     private static final double IM_MAX = -IM_MIN;
     private static final double IM_SIZE = IM_MAX - IM_MIN;
 
-    private static final double LOG2 = Math.log(2);
+    private static final double LOG2 = Math.log(2.0);
     private static final double LOG2_LOG2 = Math.log(LOG2) / LOG2;
-    private static final double LOG2_LOG2_2 = 2 + LOG2_LOG2;
+    private static final double LOG2_LOG2_2 = 2.0 + LOG2_LOG2;
     private static final int OVERFLOW = 300;
 
     private final FieldAsyncTaskListener listener;
@@ -81,9 +81,9 @@ public class FractalAsyncTask extends AsyncTask<Matrix, Canvas, Canvas> {
     private final RectF rect = new RectF();
     private final float[] hsv = {0f, 1f, 1f};
     private long startDelay = 0L;
-    private double zoom = 1;
-    private double scrollX = 0;
-    private double scrollY = 0;
+    private double zoom = 1.0;
+    private double scrollX = 0.0;
+    private double scrollY = 0.0;
 
     public FractalAsyncTask(FieldAsyncTaskListener listener, Canvas canvas) {
         this.listener = listener;
@@ -100,9 +100,9 @@ public class FractalAsyncTask extends AsyncTask<Matrix, Canvas, Canvas> {
 
         listener.onTaskStarted(this);
 
-        scrollX = 0;
-        scrollY = 0;
-        zoom = 1;
+        scrollX = 0.0;
+        scrollY = 0.0;
+        zoom = 1.0;
     }
 
     @Override
@@ -132,8 +132,8 @@ public class FractalAsyncTask extends AsyncTask<Matrix, Canvas, Canvas> {
         double sizeIm = (h >= w) ? sizeMin * IM_SIZE / RE_SIZE : sizeMin;
         double sizeSetRe = sizeRe * zoom / RE_SIZE;
         double sizeSetIm = sizeIm * zoom / IM_SIZE;
-        double offsetRe = scrollX + Math.min(0, (sizeRe - w) / 2);
-        double offsetIm = scrollY + Math.min(0, (sizeIm - h) / 2);
+        double offsetRe = scrollX + Math.min(0.0, (sizeRe - w) / 2.0);
+        double offsetIm = scrollY + Math.min(0.0, (sizeIm - h) / 2.0);
 
         int shifts = 0;
         while (sizeMax > 1) {
@@ -240,10 +240,10 @@ public class FractalAsyncTask extends AsyncTask<Matrix, Canvas, Canvas> {
      * http://en.wikipedia.org/wiki/Mandelbrot_set
      */
     private void plotMandelbrot(Canvas canvas, int x, int y, int w, int h, double kRe, double kIm, double density) {
-        double zRe = 0;
-        double zIm = 0;
-        double zReSrq = 0;
-        double zImSrq = 0;
+        double zRe = 0.0;
+        double zIm = 0.0;
+        double zReSrq = 0.0;
+        double zImSrq = 0.0;
         double d;
         double r;
         int i = 0;
@@ -251,7 +251,7 @@ public class FractalAsyncTask extends AsyncTask<Matrix, Canvas, Canvas> {
 
         do {
             r = zReSrq - zImSrq + kRe;
-            zIm = (2 * zRe * zIm) + kIm;
+            zIm = (2.0 * zRe * zIm) + kIm;
             zRe = r;
             zReSrq = zRe * zRe;
             zImSrq = zIm * zIm;
@@ -264,7 +264,7 @@ public class FractalAsyncTask extends AsyncTask<Matrix, Canvas, Canvas> {
         if (underflow) {
             z += LOG2_LOG2_2 - (Math.log(Math.log(d)) / LOG2);
         } else {
-            z = 0;
+            z = 0.0;
         }
 
         paint.setColor(mapColor(z, density));
@@ -273,7 +273,7 @@ public class FractalAsyncTask extends AsyncTask<Matrix, Canvas, Canvas> {
     }
 
     private int mapColor(double c, double density) {
-        if (c == 0) {
+        if (c == 0.0) {
             return Color.BLACK;
         }
         hsv[0] = (float) ((c * density) % 360);

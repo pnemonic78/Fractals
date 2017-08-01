@@ -138,9 +138,9 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
                 Matrix m = new Matrix();
                 // Changed orientation?
                 if ((width < bw) && (height > bh)) {// Portrait?
-                    m.postRotate(90, bw / 2, bh / 2);
+                    m.postRotate(90f, bw / 2f, bh / 2f);
                 } else {// Landscape?
-                    m.postRotate(270, bw / 2, bh / 2);
+                    m.postRotate(270f, bw / 2f, bh / 2f);
                 }
                 Bitmap rotated = Bitmap.createBitmap(bitmapOld, 0, 0, bw, bh, m, true);
                 bitmap = Bitmap.createScaledBitmap(rotated, width, height, true);
@@ -225,10 +225,9 @@ public class FractalsView extends View implements FractalAsyncTask.FieldAsyncTas
             out.writeFloatArray(values);
         }
 
-        public static final Parcelable.Creator<SavedState> CREATOR
-                = new Parcelable.Creator<SavedState>() {
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
+        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
+            public SavedState createFromParcel(Parcel p) {
+                return new SavedState(p);
             }
 
             public SavedState[] newArray(int size) {
