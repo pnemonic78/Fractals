@@ -13,41 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.fractals;
+package com.github.fractals
 
 /**
  * Complex number.
- *
  * @author Moshe Waisberg
  */
-public class Complex {
+class Complex(var real: Double, var imaginary: Double) {
 
-    private double real;
-    private double imaginary;
-
-    public Complex(double real, double imaginary) {
-        this.real = real;
-        this.imaginary = imaginary;
-    }
-
-    public double getReal() {
-        return real;
-    }
-
-    public double getImaginary() {
-        return imaginary;
-    }
-
-    public void setReal(double real) {
-        this.real = real;
-    }
-
-    public void setImaginary(double imaginary) {
-        this.imaginary = imaginary;
-    }
-
-    public void set(double real, double imaginary) {
-        this.real = real;
-        this.imaginary = imaginary;
+    operator fun set(real: Double, imaginary: Double) {
+        this.real = real
+        this.imaginary = imaginary
     }
 }
