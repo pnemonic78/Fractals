@@ -46,8 +46,8 @@ class FractalsWallpaperService : WallpaperService() {
          */
         private val DELAY = 10L * DateUtils.SECOND_IN_MILLIS
 
-        private var fieldsView: WallpaperView? = null
-        private var gestureDetector: GestureDetector? = null
+        private lateinit var fieldsView: WallpaperView
+        private lateinit var gestureDetector: GestureDetector
         private val random = Random()
         private var drawing: Boolean = false
 
@@ -63,16 +63,16 @@ class FractalsWallpaperService : WallpaperService() {
 
         override fun onDestroy() {
             super.onDestroy()
-            fieldsView!!.cancel()
+            fieldsView.cancel()
         }
 
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-            fieldsView!!.setSize(width, height)
+            fieldsView.setSize(width, height)
             randomise()
         }
 
         override fun onSurfaceDestroyed(holder: SurfaceHolder) {
-            fieldsView!!.cancel()
+            fieldsView.cancel()
         }
 
         override fun onSurfaceRedrawNeeded(holder: SurfaceHolder) {
@@ -80,14 +80,14 @@ class FractalsWallpaperService : WallpaperService() {
         }
 
         override fun onTouchEvent(event: MotionEvent) {
-            gestureDetector!!.onTouchEvent(event)
+            gestureDetector.onTouchEvent(event)
         }
 
         override fun onVisibilityChanged(visible: Boolean) {
             if (visible) {
-                fieldsView!!.start()
+                fieldsView.start()
             } else {
-                fieldsView!!.cancel()
+                fieldsView.cancel()
             }
         }
 
@@ -96,14 +96,14 @@ class FractalsWallpaperService : WallpaperService() {
          * @param delay the start delay, in milliseconds.
          */
         private fun randomise(delay: Long = 0L) {
-            fieldsView!!.clear()
-            val x = (if (random.nextBoolean()) +0.25f else -0.25f) * random.nextFloat() * fieldsView!!.width.toFloat()
-            val y = (if (random.nextBoolean()) +0.25f else -0.25f) * random.nextFloat() * fieldsView!!.height.toFloat()
+            fieldsView.clear()
+            val x = (if (random.nextBoolean()) +0.25f else -0.25f) * random.nextFloat() * fieldsView.width.toFloat()
+            val y = (if (random.nextBoolean()) +0.25f else -0.25f) * random.nextFloat() * fieldsView.height.toFloat()
             val z = Math.max(0.25f, random.nextFloat() * 5f)
-            val matrix = fieldsView!!.bitmapMatrix
+            val matrix = fieldsView.bitmapMatrix
             matrix.preTranslate(x, y)
             matrix.postScale(z, z)
-            fieldsView!!.restart(delay)
+            fieldsView.restart(delay)
         }
 
         override fun onRenderFieldStarted(view: WallpaperView) {}
@@ -132,7 +132,7 @@ class FractalsWallpaperService : WallpaperService() {
                 try {
                     val canvas = surfaceHolder.lockCanvas()
                     if (canvas != null) {
-                        fieldsView!!.draw(canvas)
+                        fieldsView.draw(canvas)
                         surfaceHolder.unlockCanvasAndPost(canvas)
                     }
                 } catch (e: IllegalArgumentException) {
