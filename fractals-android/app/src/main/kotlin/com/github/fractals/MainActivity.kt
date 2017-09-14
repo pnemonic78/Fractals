@@ -67,8 +67,8 @@ class MainActivity : Activity(),
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         if (v === fractalsView) {
-            var result = scaleGestureDetector!!.onTouchEvent(event)
-            result = gestureDetector!!.onTouchEvent(event) || result
+            var result = scaleGestureDetector.onTouchEvent(event)
+            result = gestureDetector.onTouchEvent(event) || result
             result = result || super.onTouchEvent(event)
 
             when (event.actionMasked) {

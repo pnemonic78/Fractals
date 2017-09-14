@@ -61,7 +61,7 @@ class WallpaperView(context: Context, listener: WallpaperListener) : FractalAsyn
      * Start the task.
      * @param delay the start delay, in milliseconds.
      */
-    @JvmOverloads fun start(delay: Long = 0L) {
+    fun start(delay: Long = 0L) {
         if (!isRendering) {
             task = FractalAsyncTask(this, Canvas(bitmap!!))
             task!!.setSaturation(0.5f)
@@ -84,7 +84,7 @@ class WallpaperView(context: Context, listener: WallpaperListener) : FractalAsyn
      * Restart the task with modified charges.
      * @param delay the start delay, in milliseconds.
      */
-    @JvmOverloads fun restart(delay: Long = 0L) {
+    fun restart(delay: Long = 0L) {
         cancel()
         start(delay)
     }
