@@ -42,7 +42,7 @@ class MainActivity : Activity(),
     private lateinit var mainView: FractalsView
     private lateinit var gestureDetector: GestureDetector
     private lateinit var scaleGestureDetector: ScaleGestureDetector
-    private var saveTask: AsyncTask<*, *, *>? = null
+    private var saveTask: SaveFileTask? = null
     private var menuStop: MenuItem? = null
     private var scrollXViewing = 0f
     private var scrollYViewing = 0f
@@ -213,7 +213,8 @@ class MainActivity : Activity(),
         if ((saveTask != null) && (saveTask!!.status == AsyncTask.Status.RUNNING)) {
             return
         }
-        saveTask = SaveFileTask(this).execute(mainView.getBitmap())
+        saveTask = SaveFileTask(this)
+        saveTask!!.execute(mainView.getBitmap())
     }
 
     override fun onRenderFieldPan(view: FractalsView, dx: Int, dy: Int) {
