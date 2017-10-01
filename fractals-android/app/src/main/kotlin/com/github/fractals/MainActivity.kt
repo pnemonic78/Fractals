@@ -268,7 +268,7 @@ class MainActivity : Activity(),
      */
     private fun showFullscreen(): Boolean {
         val actionBar = actionBar
-        if (actionBar != null && actionBar.isShowing) {
+        if ((actionBar != null) && actionBar.isShowing) {
             // Hide the status bar.
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
                 window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
