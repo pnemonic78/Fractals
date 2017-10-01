@@ -39,7 +39,7 @@ class MainActivity : Activity(),
 
     private val REQUEST_SAVE = 1
 
-    private lateinit var fractalsView: FractalsView
+    private lateinit var mainView: FractalsView
     private lateinit var gestureDetector: GestureDetector
     private lateinit var scaleGestureDetector: ScaleGestureDetector
     private var saveTask: AsyncTask<*, *, *>? = null
@@ -53,9 +53,9 @@ class MainActivity : Activity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        fractalsView = findViewById(R.id.fractals)
-        fractalsView.setOnTouchListener(this)
-        fractalsView.setElectricFieldsListener(this)
+        mainView = findViewById(R.id.fractals)
+        mainView.setOnTouchListener(this)
+        mainView.setElectricFieldsListener(this)
 
         gestureDetector = GestureDetector(this, this)
         scaleGestureDetector = ScaleGestureDetector(this, this)
@@ -63,11 +63,11 @@ class MainActivity : Activity(),
 
     override fun onDestroy() {
         super.onDestroy()
-        fractalsView.cancel()
+        mainView.cancel()
     }
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
-        if (v === fractalsView) {
+        if (v === mainView) {
             var result = scaleGestureDetector.onTouchEvent(event)
             result = gestureDetector.onTouchEvent(event) || result
             result = result || super.onTouchEvent(event)
@@ -107,25 +107,25 @@ class MainActivity : Activity(),
         }
         scaling = true
         zoomViewing = 1f
-        fractalsView.scaleX = zoomViewing
-        fractalsView.scaleY = zoomViewing
+        mainView.scaleX = zoomViewing
+        mainView.scaleY = zoomViewing
         return true
     }
 
     override fun onScale(detector: ScaleGestureDetector): Boolean {
         zoomViewing *= detector.scaleFactor
-        fractalsView.scaleX = zoomViewing
-        fractalsView.scaleY = zoomViewing
+        mainView.scaleX = zoomViewing
+        mainView.scaleY = zoomViewing
         return true
     }
 
     override fun onScaleEnd(detector: ScaleGestureDetector) {
-        fractalsView.scaleX = 1f
-        fractalsView.scaleY = 1f
-        val matrix = fractalsView.bitmapMatrix
+        mainView.scaleX = 1f
+        mainView.scaleY = 1f
+        val matrix = mainView.bitmapMatrix
         matrix.postScale(zoomViewing, zoomViewing)
 
-        fractalsView.restart()
+        mainView.restart()
         scaling = false
     }
 
@@ -136,7 +136,7 @@ class MainActivity : Activity(),
         scrolling = true
         scrollXViewing += distanceX
         scrollYViewing += distanceY
-        fractalsView.scrollTo(scrollXViewing.toInt(), scrollYViewing.toInt())
+        mainView.scrollTo(scrollXViewing.toInt(), scrollYViewing.toInt())
         return true
     }
 
@@ -145,11 +145,11 @@ class MainActivity : Activity(),
         if (scaling) {
             return
         }
-        fractalsView.cancel()
-        fractalsView.scrollTo(0, 0)
-        val matrix = fractalsView.bitmapMatrix
+        mainView.cancel()
+        mainView.scrollTo(0, 0)
+        val matrix = mainView.bitmapMatrix
         matrix.postTranslate(scrollXViewing, scrollYViewing)
-        fractalsView.start()
+        mainView.start()
         scrollXViewing = 0f
         scrollYViewing = 0f
     }
@@ -169,7 +169,7 @@ class MainActivity : Activity(),
         menuInflater.inflate(R.menu.main, menu)
 
         menuStop = menu.findItem(R.id.menu_stop)
-        menuStop!!.isEnabled = fractalsView.isRendering
+        menuStop!!.isEnabled = mainView.isRendering
 
         return true
     }
@@ -213,7 +213,7 @@ class MainActivity : Activity(),
         if ((saveTask != null) && (saveTask!!.status == AsyncTask.Status.RUNNING)) {
             return
         }
-        saveTask = SaveFileTask(this).execute(fractalsView.getBitmap())
+        saveTask = SaveFileTask(this).execute(mainView.getBitmap())
     }
 
     override fun onRenderFieldPan(view: FractalsView, dx: Int, dy: Int) {
@@ -223,7 +223,7 @@ class MainActivity : Activity(),
     }
 
     override fun onRenderFieldStarted(view: FractalsView) {
-        if (view == fractalsView) {
+        if (view == mainView) {
             if (menuStop != null) {
                 menuStop!!.isEnabled = view.isRendering
             }
@@ -231,7 +231,7 @@ class MainActivity : Activity(),
     }
 
     override fun onRenderFieldFinished(view: FractalsView) {
-        if (view == fractalsView) {
+        if (view == mainView) {
             if (menuStop != null) {
                 menuStop!!.isEnabled = false
             }
@@ -240,7 +240,7 @@ class MainActivity : Activity(),
     }
 
     override fun onRenderFieldCancelled(view: FractalsView) {
-        if (view == fractalsView) {
+        if (view == mainView) {
             if (menuStop != null) {
                 menuStop!!.isEnabled = false
             }
@@ -314,8 +314,8 @@ class MainActivity : Activity(),
     }
 
     private fun stop() {
-        fractalsView.cancel()
-        fractalsView.clear()
+        mainView.cancel()
+        mainView.clear()
 
         if (saveTask != null) {
             saveTask!!.cancel(true)
@@ -323,7 +323,7 @@ class MainActivity : Activity(),
     }
 
     private fun start() {
-        fractalsView.start()
+        mainView.start()
     }
 
     override fun onResume() {
