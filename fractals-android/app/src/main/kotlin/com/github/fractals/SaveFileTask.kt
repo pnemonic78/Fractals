@@ -52,8 +52,8 @@ class SaveFileTask(val context: Context) : AsyncTask<Bitmap, File, Uri>() {
 
     private val timestampFormat: DateFormat = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US)
 
-    private var bitmap: Bitmap? = null
-    private var builder: Notification.Builder? = null
+    private lateinit var bitmap: Bitmap
+    private lateinit var builder: Notification.Builder
 
     override fun doInBackground(vararg params: Bitmap): Uri? {
         val folderPictures = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
@@ -83,9 +83,9 @@ class SaveFileTask(val context: Context) : AsyncTask<Bitmap, File, Uri>() {
 
         val notification: Notification
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            notification = builder!!.build()
+            notification = builder.build()
         } else {
-            notification = builder!!.notification
+            notification = builder.notification
         }
 
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -127,25 +127,25 @@ class SaveFileTask(val context: Context) : AsyncTask<Bitmap, File, Uri>() {
     }
 
     override fun onPostExecute(file: Uri?) {
-        builder!!.setOngoing(false)
+        builder.setOngoing(false)
 
         if ((file != null) && (bitmap != null)) {
             val intent = Intent(Intent.ACTION_VIEW)
             intent.setDataAndType(file, IMAGE_MIME)
             val pendingIntent = PendingIntent.getActivity(context, REQUEST_VIEW, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-            builder!!.setContentTitle(context.getText(R.string.saved_title))
+            builder.setContentTitle(context.getText(R.string.saved_title))
                     .setContentText(context.getText(R.string.saved_text))
                     .setContentIntent(pendingIntent)
         } else {
-            builder!!.setContentText(context.getText(R.string.save_failed))
+            builder.setContentText(context.getText(R.string.save_failed))
         }
 
         val notification: Notification
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            notification = builder!!.build()
+            notification = builder.build()
         } else {
-            notification = builder!!.notification
+            notification = builder.notification
         }
 
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
