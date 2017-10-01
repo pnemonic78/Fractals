@@ -27,6 +27,7 @@ import android.widget.Toast
 
 /**
  * Main activity.
+ *
  * @author Moshe Waisberg
  */
 class MainActivity : Activity(),
