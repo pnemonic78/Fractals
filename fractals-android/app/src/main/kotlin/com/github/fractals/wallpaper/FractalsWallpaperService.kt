@@ -173,5 +173,5 @@ class FractalsWallpaperService : WallpaperService() {
         override fun onSingleTapUp(e: MotionEvent): Boolean {
             return false
         }
-   }
+    }
 }
