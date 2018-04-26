@@ -17,10 +17,11 @@ package com.github.fractals.wallpaper
 
 import android.service.wallpaper.WallpaperService
 import android.text.format.DateUtils
-import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.SurfaceHolder
+import com.github.fractals.Fractals
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Fractals wallpaper service.
@@ -34,12 +35,9 @@ class FractalsWallpaperService : WallpaperService() {
 
     /**
      * Fractals wallpaper engine.
-     * @author moshe.w
+     * @author Moshe Waisberg
      */
-    protected inner class FractalsWallpaperEngine : WallpaperService.Engine(),
-            GestureDetector.OnGestureListener,
-            GestureDetector.OnDoubleTapListener,
-            WallpaperListener {
+    protected inner class FractalsWallpaperEngine : WallpaperService.Engine(), WallpaperListener {
 
         /**
          * Enough time for user to admire the wallpaper before starting the next rendition.
@@ -47,9 +45,8 @@ class FractalsWallpaperService : WallpaperService() {
         private val DELAY = 10L * DateUtils.SECOND_IN_MILLIS
 
         private lateinit var fieldsView: WallpaperView
-        private lateinit var gestureDetector: GestureDetector
         private val random = Random()
-        private var drawing: Boolean = false
+        private val drawing = AtomicBoolean()
 
         override fun onCreate(surfaceHolder: SurfaceHolder) {
             super.onCreate(surfaceHolder)
@@ -57,13 +54,11 @@ class FractalsWallpaperService : WallpaperService() {
 
             val context = this@FractalsWallpaperService
             fieldsView = WallpaperView(context, this)
-
-            gestureDetector = GestureDetector(context, this)
         }
 
         override fun onDestroy() {
             super.onDestroy()
-            fieldsView.cancel()
+            fieldsView.stop()
         }
 
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
@@ -72,7 +67,7 @@ class FractalsWallpaperService : WallpaperService() {
         }
 
         override fun onSurfaceDestroyed(holder: SurfaceHolder) {
-            fieldsView.cancel()
+            fieldsView.stop()
         }
 
         override fun onSurfaceRedrawNeeded(holder: SurfaceHolder) {
@@ -80,14 +75,14 @@ class FractalsWallpaperService : WallpaperService() {
         }
 
         override fun onTouchEvent(event: MotionEvent) {
-            gestureDetector.onTouchEvent(event)
+            fieldsView.onTouchEvent(event)
         }
 
         override fun onVisibilityChanged(visible: Boolean) {
             if (visible) {
                 fieldsView.start()
             } else {
-                fieldsView.cancel()
+                fieldsView.stop()
             }
         }
 
@@ -106,15 +101,23 @@ class FractalsWallpaperService : WallpaperService() {
             fieldsView.restart(delay)
         }
 
-        override fun onRenderFieldStarted(view: WallpaperView) {}
+        override fun onRenderFieldPan(view: Fractals, dx: Int, dy: Int) {
+            // Pan not relevant to wallpaper.
+        }
 
-        override fun onRenderFieldFinished(view: WallpaperView) {
+        override fun onRenderFieldZoom(view: Fractals, scale: Double) {
+            // Zoom not relevant to wallpaper.
+        }
+
+        override fun onRenderFieldStarted(view: Fractals) {}
+
+        override fun onRenderFieldFinished(view: Fractals) {
             if (view === fieldsView) {
                 randomise(DELAY)
             }
         }
 
-        override fun onRenderFieldCancelled(view: WallpaperView) {}
+        override fun onRenderFieldCancelled(view: Fractals) {}
 
         override fun onDraw(view: WallpaperView) {
             if (view === fieldsView) {
@@ -123,55 +126,25 @@ class FractalsWallpaperService : WallpaperService() {
         }
 
         fun draw() {
-            if (drawing) {
+            if (!drawing.compareAndSet(false, true)) {
                 return
             }
-            drawing = true
             val surfaceHolder = surfaceHolder
             if (surfaceHolder.surface.isValid) {
                 try {
                     val canvas = surfaceHolder.lockCanvas()
                     if (canvas != null) {
-                        fieldsView.draw(canvas)
-                        surfaceHolder.unlockCanvasAndPost(canvas)
+                        try {
+                            fieldsView.draw(canvas)
+                        } finally {
+                            surfaceHolder.unlockCanvasAndPost(canvas)
+                        }
                     }
                 } catch (e: IllegalArgumentException) {
                     e.printStackTrace()
                 }
             }
-            drawing = false
-        }
-
-        override fun onDoubleTap(e: MotionEvent): Boolean {
-            return false
-        }
-
-        override fun onDoubleTapEvent(e: MotionEvent): Boolean {
-            return false
-        }
-
-        override fun onDown(e: MotionEvent): Boolean {
-            return false
-        }
-
-        override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-            return false
-        }
-
-        override fun onLongPress(e: MotionEvent) {}
-
-        override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-            return false
-        }
-
-        override fun onShowPress(e: MotionEvent) {}
-
-        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-            return false
-        }
-
-        override fun onSingleTapUp(e: MotionEvent): Boolean {
-            return false
+            drawing.set(false)
         }
     }
 }

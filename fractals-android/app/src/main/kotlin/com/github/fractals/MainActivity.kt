@@ -63,7 +63,7 @@ class MainActivity : Activity(),
 
     override fun onDestroy() {
         super.onDestroy()
-        mainView.cancel()
+        mainView.stop()
     }
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
@@ -145,7 +145,7 @@ class MainActivity : Activity(),
         if (scaling) {
             return
         }
-        mainView.cancel()
+        mainView.stop()
         mainView.scrollTo(0, 0)
         val matrix = mainView.bitmapMatrix
         matrix.postTranslate(scrollXViewing, scrollYViewing)
@@ -217,21 +217,21 @@ class MainActivity : Activity(),
         saveTask!!.execute(mainView.getBitmap())
     }
 
-    override fun onRenderFieldPan(view: FractalsView, dx: Int, dy: Int) {
+    override fun onRenderFieldPan(view: Fractals, dx: Int, dy: Int) {
     }
 
-    override fun onRenderFieldZoom(view: FractalsView, scale: Double) {
+    override fun onRenderFieldZoom(view: Fractals, scale: Double) {
     }
 
-    override fun onRenderFieldStarted(view: FractalsView) {
+    override fun onRenderFieldStarted(view: Fractals) {
         if (view == mainView) {
             if (menuStop != null) {
-                menuStop!!.isEnabled = view.isRendering
+                menuStop!!.isEnabled = (view as FractalsView).isRendering
             }
         }
     }
 
-    override fun onRenderFieldFinished(view: FractalsView) {
+    override fun onRenderFieldFinished(view: Fractals) {
         if (view == mainView) {
             if (menuStop != null) {
                 menuStop!!.isEnabled = false
@@ -240,7 +240,7 @@ class MainActivity : Activity(),
         }
     }
 
-    override fun onRenderFieldCancelled(view: FractalsView) {
+    override fun onRenderFieldCancelled(view: Fractals) {
         if (view == mainView) {
             if (menuStop != null) {
                 menuStop!!.isEnabled = false
@@ -315,7 +315,7 @@ class MainActivity : Activity(),
     }
 
     private fun stop() {
-        mainView.cancel()
+        mainView.stop()
         mainView.clear()
 
         if (saveTask != null) {

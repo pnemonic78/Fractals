@@ -29,7 +29,7 @@ import android.view.View
  * Fractals view.
  * @author Moshe Waisberg
  */
-class FractalsView : View, FractalAsyncTask.FieldAsyncTaskListener {
+class FractalsView : View, FractalAsyncTask.FieldAsyncTaskListener, Fractals {
 
     private var bitmap: Bitmap? = null
     private var task: FractalAsyncTask? = null
@@ -45,7 +45,7 @@ class FractalsView : View, FractalAsyncTask.FieldAsyncTaskListener {
 
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {}
 
-    fun clear() {
+    override fun clear() {
         bitmapMatrix.reset()
     }
 
@@ -57,31 +57,17 @@ class FractalsView : View, FractalAsyncTask.FieldAsyncTaskListener {
         canvas.drawBitmap(b, dx, dy, null)
     }
 
-    /**
-     * Start the task.
-     */
-    fun start() {
+    override fun start(delay: Long) {
         if (!isRendering) {
             task = FractalAsyncTask(this, Canvas(getBitmap()))
             task!!.execute(bitmapMatrix)
         }
     }
 
-    /**
-     * Cancel the task.
-     */
-    fun cancel() {
+    override fun stop() {
         if (task != null) {
             task!!.cancel(true)
         }
-    }
-
-    /**
-     * Restart the task with modified charges.
-     */
-    fun restart() {
-        cancel()
-        start()
     }
 
     override fun onTaskStarted(task: FractalAsyncTask) {

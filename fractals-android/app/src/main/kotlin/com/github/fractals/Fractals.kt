@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, Moshe Waisberg
+ * Copyright 2018, Moshe Waisberg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,34 @@ package com.github.fractals
 
 /**
  * Fractals event listener.
+ *
  * @author Moshe Waisberg
  */
-interface FractalsListener {
+interface Fractals {
 
-    fun onRenderFieldZoom(view: Fractals, scale: Double)
+    /**
+     * Clear and reset the task.
+     */
+    fun clear()
 
-    fun onRenderFieldPan(view: Fractals, dx: Int, dy: Int)
+    /**
+     * Start the task.
+     * @param delay the start delay, in milliseconds.
+     */
+    fun start(delay: Long = 0L)
 
-    fun onRenderFieldStarted(view: Fractals)
+    /**
+     * Stop the task.
+     */
+    fun stop()
 
-    fun onRenderFieldFinished(view: Fractals)
-
-    fun onRenderFieldCancelled(view: Fractals)
+    /**
+     * Restart the task.
+     *
+     * @param delay the start delay, in milliseconds.
+     */
+    fun restart(delay: Long = 0L) {
+        stop()
+        start(delay)
+    }
 }

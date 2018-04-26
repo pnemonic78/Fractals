@@ -20,14 +20,20 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Matrix
 import android.os.AsyncTask
-
+import android.view.GestureDetector
+import android.view.MotionEvent
 import com.github.fractals.FractalAsyncTask
+import com.github.fractals.Fractals
 
 /**
  * Live wallpaper view.
  * @author Moshe Waisberg
  */
-class WallpaperView(context: Context, listener: WallpaperListener) : FractalAsyncTask.FieldAsyncTaskListener {
+class WallpaperView(context: Context, listener: WallpaperListener) :
+        Fractals,
+        FractalAsyncTask.FieldAsyncTaskListener,
+        GestureDetector.OnGestureListener,
+        GestureDetector.OnDoubleTapListener {
 
     var width: Int = 0
         private set
@@ -36,16 +42,20 @@ class WallpaperView(context: Context, listener: WallpaperListener) : FractalAsyn
     private var bitmap: Bitmap? = null
     private var task: FractalAsyncTask? = null
     private var listener: WallpaperListener? = null
+    private val gestureDetector: GestureDetector
+    var idle = false
+        private set
     /**
      * The matrix for the bitmap.
      */
     val bitmapMatrix = Matrix()
 
     init {
+        gestureDetector = GestureDetector(context, this)
         setWallpaperListener(listener)
     }
 
-    fun clear() {
+    override fun clear() {
         bitmapMatrix.reset()
     }
 
@@ -57,11 +67,7 @@ class WallpaperView(context: Context, listener: WallpaperListener) : FractalAsyn
         canvas.drawBitmap(bitmap!!, 0f, 0f, null)
     }
 
-    /**
-     * Start the task.
-     * @param delay the start delay, in milliseconds.
-     */
-    fun start(delay: Long = 0L) {
+    override fun start(delay: Long) {
         if (!isRendering) {
             task = FractalAsyncTask(this, Canvas(bitmap!!))
             task!!.setSaturation(0.5f)
@@ -71,22 +77,10 @@ class WallpaperView(context: Context, listener: WallpaperListener) : FractalAsyn
         }
     }
 
-    /**
-     * Cancel the task.
-     */
-    fun cancel() {
+    override fun stop() {
         if (task != null) {
             task!!.cancel(true)
         }
-    }
-
-    /**
-     * Restart the task with modified charges.
-     * @param delay the start delay, in milliseconds.
-     */
-    fun restart(delay: Long = 0L) {
-        cancel()
-        start(delay)
     }
 
     /**
@@ -121,6 +115,38 @@ class WallpaperView(context: Context, listener: WallpaperListener) : FractalAsyn
 
     override fun repaint(task: FractalAsyncTask) {
         invalidate()
+    }
+
+    override fun onDoubleTap(e: MotionEvent): Boolean {
+        return false
+    }
+
+    override fun onDoubleTapEvent(e: MotionEvent): Boolean {
+        return false
+    }
+
+    override fun onDown(e: MotionEvent): Boolean {
+        return false
+    }
+
+    override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+        return false
+    }
+
+    override fun onLongPress(e: MotionEvent) {}
+
+    override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+        return false
+    }
+
+    override fun onShowPress(e: MotionEvent) {}
+
+    override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+        return false
+    }
+
+    override fun onSingleTapUp(e: MotionEvent): Boolean {
+        return false
     }
 
     private fun invalidate() {
@@ -160,4 +186,8 @@ class WallpaperView(context: Context, listener: WallpaperListener) : FractalAsyn
      */
     val isRendering: Boolean
         get() = task != null && !task!!.isCancelled && task!!.status != AsyncTask.Status.FINISHED
+
+    fun onTouchEvent(event: MotionEvent) {
+        gestureDetector.onTouchEvent(event)
+    }
 }

@@ -15,17 +15,13 @@
  */
 package com.github.fractals.wallpaper
 
+import com.github.fractals.FractalsListener
+
 /**
  * Fractals event listener for live wallpaper.
  * @author Moshe Waisberg
  */
-interface WallpaperListener {
-
-    fun onRenderFieldStarted(view: WallpaperView)
-
-    fun onRenderFieldFinished(view: WallpaperView)
-
-    fun onRenderFieldCancelled(view: WallpaperView)
+interface WallpaperListener : FractalsListener {
 
     fun onDraw(view: WallpaperView)
 }
