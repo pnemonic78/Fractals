@@ -181,7 +181,7 @@ class MainActivity : Activity(),
                 return true
             }
             R.id.menu_fullscreen -> {
-                if (actionBar!!.isShowing) {
+                if (actionBar?.isShowing == true) {
                     showFullscreen()
                 } else {
                     hideFullscreen()
@@ -225,26 +225,20 @@ class MainActivity : Activity(),
 
     override fun onRenderFieldStarted(view: Fractals) {
         if (view == mainView) {
-            if (menuStop != null) {
-                menuStop!!.isEnabled = (view as FractalsView).isRendering
-            }
+            menuStop?.isEnabled = (view as FractalsView).isRendering
         }
     }
 
     override fun onRenderFieldFinished(view: Fractals) {
         if (view == mainView) {
-            if (menuStop != null) {
-                menuStop!!.isEnabled = false
-            }
+            menuStop?.isEnabled = false
             Toast.makeText(this, R.string.finished, Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun onRenderFieldCancelled(view: Fractals) {
         if (view == mainView) {
-            if (menuStop != null) {
-                menuStop!!.isEnabled = false
-            }
+            menuStop?.isEnabled = false
         }
     }
 
@@ -318,9 +312,7 @@ class MainActivity : Activity(),
         mainView.stop()
         mainView.clear()
 
-        if (saveTask != null) {
-            saveTask!!.cancel(true)
-        }
+        saveTask?.cancel(true)
     }
 
     private fun start() {

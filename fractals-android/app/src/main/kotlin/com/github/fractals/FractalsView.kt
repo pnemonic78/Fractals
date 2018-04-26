@@ -65,30 +65,22 @@ class FractalsView : View, FractalAsyncTask.FieldAsyncTaskListener, Fractals {
     }
 
     override fun stop() {
-        if (task != null) {
-            task!!.cancel(true)
-        }
+        task?.cancel(true)
     }
 
     override fun onTaskStarted(task: FractalAsyncTask) {
-        if (listener != null) {
-            listener!!.onRenderFieldStarted(this)
-        }
+        listener?.onRenderFieldStarted(this)
     }
 
     override fun onTaskFinished(task: FractalAsyncTask) {
         if (task == this.task) {
             invalidate()
-            if (listener != null) {
-                listener!!.onRenderFieldFinished(this)
-            }
+            listener?.onRenderFieldFinished(this)
         }
     }
 
     override fun onTaskCancelled(task: FractalAsyncTask) {
-        if (listener != null) {
-            listener!!.onRenderFieldCancelled(this)
-        }
+        listener?.onRenderFieldCancelled(this)
     }
 
     override fun repaint(task: FractalAsyncTask) {

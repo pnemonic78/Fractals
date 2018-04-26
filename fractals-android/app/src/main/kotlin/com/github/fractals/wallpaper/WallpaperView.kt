@@ -19,7 +19,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Matrix
-import android.os.AsyncTask
 import android.view.GestureDetector
 import android.view.MotionEvent
 import com.github.fractals.FractalAsyncTask
@@ -59,58 +58,38 @@ class WallpaperView(context: Context, listener: WallpaperListener) :
         bitmapMatrix.reset()
     }
 
-    fun draw(canvas: Canvas) {
-        onDraw(canvas)
-    }
-
-    protected fun onDraw(canvas: Canvas) {
-        canvas.drawBitmap(bitmap!!, 0f, 0f, null)
-    }
-
     override fun start(delay: Long) {
-        if (!isRendering) {
-            task = FractalAsyncTask(this, Canvas(bitmap!!))
-            task!!.setSaturation(0.5f)
-            task!!.setBrightness(0.5f)
-            task!!.setStartDelay(delay)
-            task!!.execute(bitmapMatrix)
+        if (idle) {
+            val t = FractalAsyncTask(this, Canvas(bitmap!!))
+            task = t
+            with(t) {
+                setSaturation(0.5f)
+                setBrightness(0.5f)
+                setStartDelay(delay)
+                execute(bitmapMatrix)
+            }
         }
     }
 
     override fun stop() {
-        if (task != null) {
-            task!!.cancel(true)
-        }
-    }
-
-    /**
-     * Set the listener for events.
-     * @param listener the listener.
-     */
-    fun setWallpaperListener(listener: WallpaperListener) {
-        this.listener = listener
+        task?.cancel(true)
+        idle = true
     }
 
     override fun onTaskStarted(task: FractalAsyncTask) {
-        if (listener != null) {
-            listener!!.onRenderFieldStarted(this)
-        }
+        listener?.onRenderFieldStarted(this)
     }
 
     override fun onTaskFinished(task: FractalAsyncTask) {
         if (task === this.task) {
             invalidate()
-            if (listener != null) {
-                listener!!.onRenderFieldFinished(this)
-            }
+            listener?.onRenderFieldFinished(this)
             clear()
         }
     }
 
     override fun onTaskCancelled(task: FractalAsyncTask) {
-        if (listener != null) {
-            listener!!.onRenderFieldCancelled(this)
-        }
+        listener?.onRenderFieldCancelled(this)
     }
 
     override fun repaint(task: FractalAsyncTask) {
@@ -149,10 +128,17 @@ class WallpaperView(context: Context, listener: WallpaperListener) :
         return false
     }
 
-    private fun invalidate() {
-        if (listener != null) {
-            listener!!.onDraw(this)
-        }
+    /**
+     * Set the listener for events.
+     *
+     * @param listener the listener.
+     */
+    fun setWallpaperListener(listener: WallpaperListener) {
+        this.listener = listener
+    }
+
+    protected fun invalidate() {
+        listener?.onDraw(this)
     }
 
     fun setSize(width: Int, height: Int) {
@@ -180,12 +166,13 @@ class WallpaperView(context: Context, listener: WallpaperListener) :
         }
     }
 
-    /**
-     * Is the task busy rendering the fields?
-     * @return `true` if rendering.
-     */
-    val isRendering: Boolean
-        get() = task != null && !task!!.isCancelled && task!!.status != AsyncTask.Status.FINISHED
+    fun draw(canvas: Canvas) {
+        onDraw(canvas)
+    }
+
+    protected fun onDraw(canvas: Canvas) {
+        canvas.drawBitmap(bitmap!!, 0f, 0f, null)
+    }
 
     fun onTouchEvent(event: MotionEvent) {
         gestureDetector.onTouchEvent(event)
