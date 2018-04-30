@@ -19,10 +19,12 @@ import android.Manifest
 import android.annotation.TargetApi
 import android.app.Activity
 import android.content.pm.PackageManager
-import android.os.AsyncTask
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
 import android.os.Bundle
 import android.view.*
+import android.view.View.SYSTEM_UI_FLAG_FULLSCREEN
+import android.view.View.SYSTEM_UI_FLAG_VISIBLE
 import android.widget.Toast
 
 /**
@@ -44,6 +46,7 @@ class MainActivity : Activity(),
     private lateinit var scaleGestureDetector: ScaleGestureDetector
     private var saveTask: SaveFileTask? = null
     private var menuStop: MenuItem? = null
+    private var menuSave: MenuItem? = null
     private var scrollXViewing = 0f
     private var scrollYViewing = 0f
     private var zoomViewing = 1f
@@ -168,8 +171,12 @@ class MainActivity : Activity(),
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
 
+        val rendering = !mainView.isIdle()
+
         menuStop = menu.findItem(R.id.menu_stop)
-        menuStop!!.isEnabled = mainView.isRendering
+        menuStop!!.isEnabled = rendering
+        menuSave = menu.findItem(R.id.menu_save_file)
+        menuSave!!.isEnabled = rendering
 
         return true
     }
@@ -210,9 +217,11 @@ class MainActivity : Activity(),
         }
 
         // Busy saving?
-        if ((saveTask != null) && (saveTask!!.status == AsyncTask.Status.RUNNING)) {
+        if ((menuSave == null) || !menuSave!!.isEnabled) {
             return
         }
+        menuSave!!.isEnabled = false
+
         saveTask = SaveFileTask(this)
         saveTask!!.execute(mainView.getBitmap())
     }
@@ -225,20 +234,28 @@ class MainActivity : Activity(),
 
     override fun onRenderFieldStarted(view: Fractals) {
         if (view == mainView) {
-            menuStop?.isEnabled = (view as FractalsView).isRendering
+            runOnUiThread {
+                menuStop?.isEnabled = true
+                menuSave?.isEnabled = true
+            }
         }
     }
 
     override fun onRenderFieldFinished(view: Fractals) {
         if (view == mainView) {
-            menuStop?.isEnabled = false
-            Toast.makeText(this, R.string.finished, Toast.LENGTH_SHORT).show()
+            runOnUiThread {
+                menuStop?.isEnabled = false
+                menuSave?.isEnabled = true
+                Toast.makeText(this, R.string.finished, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     override fun onRenderFieldCancelled(view: Fractals) {
         if (view == mainView) {
-            menuStop?.isEnabled = false
+            runOnUiThread {
+                menuStop?.isEnabled = false
+            }
         }
     }
 
@@ -248,7 +265,7 @@ class MainActivity : Activity(),
 
         if (requestCode == REQUEST_SAVE) {
             if (permissions.isNotEmpty() && (permissions[0] == Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                if (grantResults.isNotEmpty() && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                if (grantResults.isNotEmpty() && (grantResults[0] == PERMISSION_GRANTED)) {
                     saveToFile()
                     return
                 }
@@ -268,8 +285,7 @@ class MainActivity : Activity(),
                 window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                         WindowManager.LayoutParams.FLAG_FULLSCREEN)
             } else {
-                val decorView = window.decorView
-                decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+                window.decorView.systemUiVisibility = SYSTEM_UI_FLAG_FULLSCREEN
             }
 
             // Hide the action bar.
@@ -290,8 +306,7 @@ class MainActivity : Activity(),
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
                 window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
             } else {
-                val decorView = window.decorView
-                decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+                window.decorView.systemUiVisibility = SYSTEM_UI_FLAG_VISIBLE
             }
 
             // Show the action bar.

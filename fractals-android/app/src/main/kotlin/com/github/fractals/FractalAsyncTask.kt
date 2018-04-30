@@ -295,4 +295,6 @@ class FractalAsyncTask(private val listener: FieldAsyncTaskListener, private val
     fun setStartDelay(delay: Long) {
         startDelay = delay
     }
+
+    fun isIdle(): Boolean = isCancelled || (status != AsyncTask.Status.RUNNING)
 }

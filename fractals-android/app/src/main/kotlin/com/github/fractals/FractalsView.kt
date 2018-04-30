@@ -19,7 +19,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Matrix
-import android.os.AsyncTask
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
@@ -58,9 +57,10 @@ class FractalsView : View, FractalAsyncTask.FieldAsyncTaskListener, Fractals {
     }
 
     override fun start(delay: Long) {
-        if (!isRendering) {
-            task = FractalAsyncTask(this, Canvas(getBitmap()))
-            task!!.execute(bitmapMatrix)
+        if (isIdle()) {
+            val t = FractalAsyncTask(this, Canvas(getBitmap()))
+            t.execute(bitmapMatrix)
+            task = t
         }
     }
 
@@ -153,11 +153,10 @@ class FractalsView : View, FractalAsyncTask.FieldAsyncTaskListener, Fractals {
     }
 
     /**
-     * Is the task busy rendering the fields?
-     * @return `true` if rendering.
+     * Is the task idle and not rendering the fields?
+     * @return `true` if idle.
      */
-    val isRendering: Boolean
-        get() = (task != null) && !task!!.isCancelled && (task!!.status != AsyncTask.Status.FINISHED)
+    fun isIdle(): Boolean = (task == null) || task!!.isIdle()
 
     class SavedState : View.BaseSavedState {
 

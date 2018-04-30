@@ -49,7 +49,9 @@ class SaveFileTask(val context: Context) : AsyncTask<Bitmap, File, Uri>() {
 
     private val ID_NOTIFY = 0x5473 // "SAVE"
 
-    private val IMAGE_MIME = "image/png"
+    companion object {
+        const val IMAGE_MIME = "image/png"
+    }
 
     private val CHANNEL_ID = "save_file"
 
