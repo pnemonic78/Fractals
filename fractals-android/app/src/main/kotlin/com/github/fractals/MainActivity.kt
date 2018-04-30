@@ -18,11 +18,13 @@ package com.github.fractals
 import android.Manifest
 import android.annotation.TargetApi
 import android.app.Activity
-import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -34,140 +36,26 @@ import io.reactivex.schedulers.Schedulers
  * @author Moshe Waisberg
  */
 class MainActivity : Activity(),
-        View.OnTouchListener,
-        GestureDetector.OnGestureListener,
-        GestureDetector.OnDoubleTapListener,
-        ScaleGestureDetector.OnScaleGestureListener,
         FractalsListener {
 
     private val REQUEST_SAVE = 1
 
     private lateinit var mainView: FractalsView
-    private lateinit var gestureDetector: GestureDetector
-    private lateinit var scaleGestureDetector: ScaleGestureDetector
     private val disposables = CompositeDisposable()
     private var menuStop: MenuItem? = null
     private var menuSave: MenuItem? = null
-    private var scrollXViewing = 0f
-    private var scrollYViewing = 0f
-    private var zoomViewing = 1f
-    private var scrolling: Boolean = false
-    private var scaling: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         mainView = findViewById(R.id.fractals)
-        mainView.setOnTouchListener(this)
         mainView.setElectricFieldsListener(this)
-
-        gestureDetector = GestureDetector(this, this)
-        scaleGestureDetector = ScaleGestureDetector(this, this)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         mainView.stop()
         disposables.dispose()
-    }
-
-    override fun onTouch(v: View, event: MotionEvent): Boolean {
-        if (v === mainView) {
-            var result = scaleGestureDetector.onTouchEvent(event)
-            result = gestureDetector.onTouchEvent(event) || result
-            result = result || super.onTouchEvent(event)
-
-            when (event.actionMasked) {
-                MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> if (scrolling) {
-                    onScrollEnd()
-                }
-            }
-
-            return result
-        }
-        return false
-    }
-
-    override fun onDoubleTap(e: MotionEvent): Boolean {
-        return false
-    }
-
-    override fun onDoubleTapEvent(e: MotionEvent): Boolean {
-        return false
-    }
-
-    override fun onDown(e: MotionEvent): Boolean {
-        return false
-    }
-
-    override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-        return false
-    }
-
-    override fun onLongPress(e: MotionEvent) {}
-
-    override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
-        if (scrolling) {
-            return false
-        }
-        scaling = true
-        zoomViewing = 1f
-        mainView.scaleX = zoomViewing
-        mainView.scaleY = zoomViewing
-        return true
-    }
-
-    override fun onScale(detector: ScaleGestureDetector): Boolean {
-        zoomViewing *= detector.scaleFactor
-        mainView.scaleX = zoomViewing
-        mainView.scaleY = zoomViewing
-        return true
-    }
-
-    override fun onScaleEnd(detector: ScaleGestureDetector) {
-        mainView.scaleX = 1f
-        mainView.scaleY = 1f
-        val matrix = mainView.bitmapMatrix
-        matrix.postScale(zoomViewing, zoomViewing)
-
-        mainView.restart()
-        scaling = false
-    }
-
-    override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-        if (scaling) {
-            return false
-        }
-        scrolling = true
-        scrollXViewing += distanceX
-        scrollYViewing += distanceY
-        mainView.scrollTo(scrollXViewing.toInt(), scrollYViewing.toInt())
-        return true
-    }
-
-    private fun onScrollEnd() {
-        scrolling = false
-        if (scaling) {
-            return
-        }
-        mainView.stop()
-        mainView.scrollTo(0, 0)
-        val matrix = mainView.bitmapMatrix
-        matrix.postTranslate(scrollXViewing, scrollYViewing)
-        mainView.start()
-        scrollXViewing = 0f
-        scrollYViewing = 0f
-    }
-
-    override fun onShowPress(e: MotionEvent) {
-    }
-
-    override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-        return false
-    }
-
-    override fun onSingleTapUp(e: MotionEvent): Boolean {
-        return false
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -212,7 +100,7 @@ class MainActivity : Activity(),
     private fun saveToFile() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val activity = this@MainActivity
-            if (activity.checkCallingOrSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (activity.checkCallingOrSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PERMISSION_GRANTED) {
                 activity.requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_SAVE)
                 return
             }

@@ -22,6 +22,9 @@ import android.graphics.Matrix
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
+import android.view.GestureDetector
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
 
 /**
@@ -31,7 +34,10 @@ import android.view.View
  */
 class FractalsView : View,
         Fractals,
-        FractalAsyncTask.FieldAsyncTaskListener {
+        FractalAsyncTask.FieldAsyncTaskListener,
+        GestureDetector.OnGestureListener,
+        GestureDetector.OnDoubleTapListener,
+        ScaleGestureDetector.OnScaleGestureListener {
 
     var bitmap: Bitmap? = null
         get() {
@@ -62,16 +68,34 @@ class FractalsView : View,
         }
     private var task: FractalAsyncTask? = null
     private var listener: FractalsListener? = null
+    private lateinit var gestureDetector: GestureDetector
+    private lateinit var scaleGestureDetector: ScaleGestureDetector
+    private var scrollXViewing = 0f
+    private var scrollYViewing = 0f
+    private var zoomViewing = 1f
+    private var scrolling: Boolean = false
+    private var scaling: Boolean = false
     /**
      * The matrix for the bitmap.
      */
     val bitmapMatrix = Matrix()
 
-    constructor(context: Context) : super(context) {}
+    constructor(context: Context) : super(context) {
+        init(context)
+    }
 
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {}
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
+        init(context)
+    }
 
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {}
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+        init(context)
+    }
+
+    private fun init(context: Context) {
+        gestureDetector = GestureDetector(context, this)
+        scaleGestureDetector = ScaleGestureDetector(context, this)
+    }
 
     override fun clear() {
         bitmapMatrix.reset()
@@ -155,6 +179,102 @@ class FractalsView : View,
      * @return `true` if idle.
      */
     fun isIdle(): Boolean = (task == null) || task!!.isIdle()
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        var result = scaleGestureDetector.onTouchEvent(event)
+        result = gestureDetector.onTouchEvent(event) || result
+        result = result || super.onTouchEvent(event)
+
+        when (event.actionMasked) {
+            MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> if (scrolling) {
+                onScrollEnd()
+            }
+        }
+
+        return result
+    }
+
+    override fun onDoubleTap(e: MotionEvent): Boolean {
+        return false
+    }
+
+    override fun onDoubleTapEvent(e: MotionEvent): Boolean {
+        return false
+    }
+
+    override fun onDown(e: MotionEvent): Boolean {
+        return false
+    }
+
+    override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+        return false
+    }
+
+    override fun onLongPress(e: MotionEvent) {}
+
+    override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
+        if (scrolling) {
+            return false
+        }
+        scaling = true
+        zoomViewing = 1f
+        this.scaleX = zoomViewing
+        this.scaleY = zoomViewing
+        return true
+    }
+
+    override fun onScale(detector: ScaleGestureDetector): Boolean {
+        zoomViewing *= detector.scaleFactor
+        this.scaleX = zoomViewing
+        this.scaleY = zoomViewing
+        return true
+    }
+
+    override fun onScaleEnd(detector: ScaleGestureDetector) {
+        this.scaleX = 1f
+        this.scaleY = 1f
+        val matrix = bitmapMatrix
+        matrix.postScale(zoomViewing, zoomViewing)
+
+        restart()
+        scaling = false
+    }
+
+    override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+        if (scaling) {
+            return false
+        }
+        scrolling = true
+        scrollXViewing += distanceX
+        scrollYViewing += distanceY
+        scrollTo(scrollXViewing.toInt(), scrollYViewing.toInt())
+        return true
+    }
+
+    private fun onScrollEnd() {
+        scrolling = false
+        if (scaling) {
+            return
+        }
+        stop()
+        scrollTo(0, 0)
+        val matrix = bitmapMatrix
+        matrix.postTranslate(scrollXViewing, scrollYViewing)
+        start()
+        scrollXViewing = 0f
+        scrollYViewing = 0f
+    }
+
+    override fun onShowPress(e: MotionEvent) {
+    }
+
+    override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+        return false
+    }
+
+    override fun onSingleTapUp(e: MotionEvent): Boolean {
+        return false
+    }
 
     class SavedState : View.BaseSavedState {
 
