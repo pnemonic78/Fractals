@@ -23,9 +23,10 @@ import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
 import android.os.Bundle
 import android.view.*
-import android.view.View.SYSTEM_UI_FLAG_FULLSCREEN
-import android.view.View.SYSTEM_UI_FLAG_VISIBLE
 import android.widget.Toast
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 
 /**
  * Main activity.
@@ -44,7 +45,7 @@ class MainActivity : Activity(),
     private lateinit var mainView: FractalsView
     private lateinit var gestureDetector: GestureDetector
     private lateinit var scaleGestureDetector: ScaleGestureDetector
-    private var saveTask: SaveFileTask? = null
+    private val disposables = CompositeDisposable()
     private var menuStop: MenuItem? = null
     private var menuSave: MenuItem? = null
     private var scrollXViewing = 0f
@@ -67,6 +68,7 @@ class MainActivity : Activity(),
     override fun onDestroy() {
         super.onDestroy()
         mainView.stop()
+        disposables.dispose()
     }
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
@@ -222,8 +224,13 @@ class MainActivity : Activity(),
         }
         menuSave!!.isEnabled = false
 
-        saveTask = SaveFileTask(this)
-        saveTask!!.execute(mainView.getBitmap())
+        val context = this
+        val bitmap = mainView.bitmap!!
+        val task = SaveFileTask(context, bitmap)
+        task.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(SaveFileObserver(context, bitmap))
+        disposables.add(task)
     }
 
     override fun onRenderFieldPan(view: Fractals, dx: Int, dy: Int) {
@@ -285,7 +292,7 @@ class MainActivity : Activity(),
                 window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                         WindowManager.LayoutParams.FLAG_FULLSCREEN)
             } else {
-                window.decorView.systemUiVisibility = SYSTEM_UI_FLAG_FULLSCREEN
+                window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
             }
 
             // Hide the action bar.
@@ -306,7 +313,7 @@ class MainActivity : Activity(),
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
                 window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
             } else {
-                window.decorView.systemUiVisibility = SYSTEM_UI_FLAG_VISIBLE
+                window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
             }
 
             // Show the action bar.
@@ -326,8 +333,6 @@ class MainActivity : Activity(),
     private fun stop() {
         mainView.stop()
         mainView.clear()
-
-        saveTask?.cancel(true)
     }
 
     private fun start() {

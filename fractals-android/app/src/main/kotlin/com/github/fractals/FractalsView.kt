@@ -26,11 +26,40 @@ import android.view.View
 
 /**
  * Fractals view.
+ *
  * @author Moshe Waisberg
  */
-class FractalsView : View, FractalAsyncTask.FieldAsyncTaskListener, Fractals {
+class FractalsView : View,
+        Fractals,
+        FractalAsyncTask.FieldAsyncTaskListener {
 
-    private var bitmap: Bitmap? = null
+    var bitmap: Bitmap? = null
+        get() {
+            val metrics = resources.displayMetrics
+            val width = metrics.widthPixels
+            val height = metrics.heightPixels
+
+            val bitmapOld = field
+            if (bitmapOld != null) {
+                val bw = bitmapOld.width
+                val bh = bitmapOld.height
+
+                if ((width != bw) || (height != bh)) {
+                    val m = Matrix()
+                    // Changed orientation?
+                    if (width < bw && height > bh) {// Portrait?
+                        m.postRotate(90f, bw / 2f, bh / 2f)
+                    } else {// Landscape?
+                        m.postRotate(270f, bw / 2f, bh / 2f)
+                    }
+                    val rotated = Bitmap.createBitmap(bitmapOld, 0, 0, bw, bh, m, true)
+                    bitmap = Bitmap.createScaledBitmap(rotated, width, height, true)
+                }
+            } else {
+                field = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            }
+            return field
+        }
     private var task: FractalAsyncTask? = null
     private var listener: FractalsListener? = null
     /**
@@ -50,7 +79,7 @@ class FractalsView : View, FractalAsyncTask.FieldAsyncTaskListener, Fractals {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        val b = getBitmap()
+        val b = bitmap!!
         val dx = (measuredWidth - b.width) / 2f
         val dy = (measuredHeight - b.height) / 2f
         canvas.drawBitmap(b, dx, dy, null)
@@ -58,14 +87,14 @@ class FractalsView : View, FractalAsyncTask.FieldAsyncTaskListener, Fractals {
 
     override fun start(delay: Long) {
         if (isIdle()) {
-            val t = FractalAsyncTask(this, Canvas(getBitmap()))
+            val t = FractalAsyncTask(this, Canvas(bitmap))
             t.execute(bitmapMatrix)
             task = t
         }
     }
 
     override fun stop() {
-        task?.cancel(true)
+        task?.cancel()
     }
 
     override fun onTaskStarted(task: FractalAsyncTask) {
@@ -85,37 +114,6 @@ class FractalsView : View, FractalAsyncTask.FieldAsyncTaskListener, Fractals {
 
     override fun repaint(task: FractalAsyncTask) {
         postInvalidate()
-    }
-
-    /**
-     * Get the bitmap.
-     * @return the bitmap.
-     */
-    fun getBitmap(): Bitmap {
-        val metrics = resources.displayMetrics
-        val width = metrics.widthPixels
-        val height = metrics.heightPixels
-
-        val bitmapOld = bitmap
-        if (bitmapOld != null) {
-            val bw = bitmapOld.width
-            val bh = bitmapOld.height
-
-            if ((width != bw) || (height != bh)) {
-                val m = Matrix()
-                // Changed orientation?
-                if ((width < bw) && (height > bh)) {// Portrait?
-                    m.postRotate(90f, bw / 2f, bh / 2f)
-                } else {// Landscape?
-                    m.postRotate(270f, bw / 2f, bh / 2f)
-                }
-                val rotated = Bitmap.createBitmap(bitmapOld, 0, 0, bw, bh, m, true)
-                bitmap = Bitmap.createScaledBitmap(rotated, width, height, true)
-            }
-        } else {
-            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        }
-        return bitmap!!
     }
 
     /**

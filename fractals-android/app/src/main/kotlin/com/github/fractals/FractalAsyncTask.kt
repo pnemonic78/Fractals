@@ -297,4 +297,8 @@ class FractalAsyncTask(private val listener: FieldAsyncTaskListener, private val
     }
 
     fun isIdle(): Boolean = isCancelled || (status != AsyncTask.Status.RUNNING)
+
+    fun cancel() {
+        cancel(true)
+    }
 }
