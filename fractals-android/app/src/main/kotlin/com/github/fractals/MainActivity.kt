@@ -65,6 +65,7 @@ class MainActivity : Activity(),
 
         menuStop = menu.findItem(R.id.menu_stop)
         menuStop!!.isEnabled = rendering
+
         menuSave = menu.findItem(R.id.menu_save_file)
         menuSave!!.isEnabled = rendering
 

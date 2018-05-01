@@ -21,8 +21,11 @@ import android.graphics.Canvas
 import android.graphics.Matrix
 import android.view.GestureDetector
 import android.view.MotionEvent
-import com.github.fractals.FractalAsyncTask
+import com.github.fractals.FractalTask
 import com.github.fractals.Fractals
+import io.reactivex.Observer
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 
 /**
  * Live wallpaper view.
@@ -30,7 +33,7 @@ import com.github.fractals.Fractals
  */
 class WallpaperView(context: Context, listener: WallpaperListener) :
         Fractals,
-        FractalAsyncTask.FieldAsyncTaskListener,
+        Observer<Bitmap>,
         GestureDetector.OnGestureListener,
         GestureDetector.OnDoubleTapListener {
 
@@ -39,7 +42,7 @@ class WallpaperView(context: Context, listener: WallpaperListener) :
     var height: Int = 0
         private set
     private var bitmap: Bitmap? = null
-    private var task: FractalAsyncTask? = null
+    private var task: FractalTask? = null
     private var listener: WallpaperListener? = null
     private val gestureDetector: GestureDetector
     var idle = false
@@ -60,40 +63,42 @@ class WallpaperView(context: Context, listener: WallpaperListener) :
 
     override fun start(delay: Long) {
         if (idle) {
-            val t = FractalAsyncTask(this, Canvas(bitmap!!))
+            val observer = this
+            val t = FractalTask(bitmapMatrix, bitmap!!)
             task = t
             with(t) {
-                setSaturation(0.5f)
-                setBrightness(0.5f)
-                setStartDelay(delay)
-                execute(bitmapMatrix)
+                saturation = 0.5f
+                brightness = 0.5f
+                startDelay = delay
+                subscribeOn(Schedulers.computation())
+                        .subscribe(observer)
             }
         }
     }
 
     override fun stop() {
-        task?.cancel(true)
+        task?.cancel()
         idle = true
     }
 
-    override fun onTaskStarted(task: FractalAsyncTask) {
-        listener?.onRenderFieldStarted(this)
+    override fun onNext(value: Bitmap) {
+        invalidate()
     }
 
-    override fun onTaskFinished(task: FractalAsyncTask) {
-        if (task === this.task) {
-            invalidate()
-            listener?.onRenderFieldFinished(this)
-            clear()
-        }
-    }
-
-    override fun onTaskCancelled(task: FractalAsyncTask) {
+    override fun onError(e: Throwable) {
+        idle = true
         listener?.onRenderFieldCancelled(this)
     }
 
-    override fun repaint(task: FractalAsyncTask) {
-        invalidate()
+    override fun onComplete() {
+        idle = true
+        listener?.onRenderFieldFinished(this)
+        clear()
+    }
+
+    override fun onSubscribe(d: Disposable) {
+        idle = false
+        listener?.onRenderFieldStarted(this)
     }
 
     override fun onDoubleTap(e: MotionEvent): Boolean {

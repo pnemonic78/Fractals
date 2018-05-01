@@ -26,6 +26,10 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import io.reactivex.Observer
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 
 /**
  * Fractals view.
@@ -34,7 +38,7 @@ import android.view.View
  */
 class FractalsView : View,
         Fractals,
-        FractalAsyncTask.FieldAsyncTaskListener,
+        Observer<Bitmap>,
         GestureDetector.OnGestureListener,
         GestureDetector.OnDoubleTapListener,
         ScaleGestureDetector.OnScaleGestureListener {
@@ -66,7 +70,7 @@ class FractalsView : View,
             }
             return field
         }
-    private var task: FractalAsyncTask? = null
+    private var task: FractalTask? = null
     private var listener: FractalsListener? = null
     private lateinit var gestureDetector: GestureDetector
     private lateinit var scaleGestureDetector: ScaleGestureDetector
@@ -111,9 +115,13 @@ class FractalsView : View,
 
     override fun start(delay: Long) {
         if (isIdle()) {
-            val t = FractalAsyncTask(this, Canvas(bitmap))
-            t.execute(bitmapMatrix)
+            val observer = this
+            val t = FractalTask(bitmapMatrix, bitmap!!)
             task = t
+            t.startDelay = delay
+            t.subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(observer)
         }
     }
 
@@ -121,23 +129,21 @@ class FractalsView : View,
         task?.cancel()
     }
 
-    override fun onTaskStarted(task: FractalAsyncTask) {
-        listener?.onRenderFieldStarted(this)
+    override fun onNext(value: Bitmap) {
+        postInvalidate()
     }
 
-    override fun onTaskFinished(task: FractalAsyncTask) {
-        if (task == this.task) {
-            invalidate()
-            listener?.onRenderFieldFinished(this)
-        }
-    }
-
-    override fun onTaskCancelled(task: FractalAsyncTask) {
+    override fun onError(e: Throwable) {
         listener?.onRenderFieldCancelled(this)
     }
 
-    override fun repaint(task: FractalAsyncTask) {
-        postInvalidate()
+    override fun onComplete() {
+        listener?.onRenderFieldFinished(this)
+        clear()
+    }
+
+    override fun onSubscribe(d: Disposable) {
+        listener?.onRenderFieldStarted(this)
     }
 
     /**
