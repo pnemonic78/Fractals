@@ -187,17 +187,21 @@ class FractalsView : View,
     fun isIdle(): Boolean = (task == null) || task!!.isIdle()
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        var result = scaleGestureDetector.onTouchEvent(event)
-        result = gestureDetector.onTouchEvent(event) || result
-        result = result || super.onTouchEvent(event)
+        if (scrolling || (event.pointerCount <= 1)) {
+            gestureDetector.onTouchEvent(event)
+        } else {
+            scaleGestureDetector.onTouchEvent(event)
+        }
+        super.onTouchEvent(event)
 
         when (event.actionMasked) {
-            MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> if (scrolling) {
+            MotionEvent.ACTION_CANCEL,
+            MotionEvent.ACTION_UP -> if (scrolling) {
                 onScrollEnd()
             }
         }
 
-        return result
+        return true
     }
 
     override fun onDoubleTap(e: MotionEvent): Boolean {
