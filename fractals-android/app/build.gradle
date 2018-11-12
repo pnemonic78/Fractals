@@ -6,7 +6,6 @@ def versionMinor = Integer.parseInt(project.APP_VERSION_MINOR)
 
 android {
     compileSdkVersion androidBuildSdkVersion
-    buildToolsVersion androidBuildToolsVersion
 
     defaultConfig {
         applicationId "com.github.fractals"
@@ -58,6 +57,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation "com.android.support:support-compat:$supportVersion"
 }
