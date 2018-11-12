@@ -19,13 +19,12 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Matrix
+import android.graphics.Point
+import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
-import android.view.GestureDetector
-import android.view.MotionEvent
-import android.view.ScaleGestureDetector
-import android.view.View
+import android.view.*
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -37,17 +36,31 @@ import io.reactivex.schedulers.Schedulers
  * @author Moshe Waisberg
  */
 class FractalsView : View,
-        Fractals,
-        Observer<Bitmap>,
-        GestureDetector.OnGestureListener,
-        GestureDetector.OnDoubleTapListener,
-        ScaleGestureDetector.OnScaleGestureListener {
+    Fractals,
+    Observer<Bitmap>,
+    GestureDetector.OnGestureListener,
+    GestureDetector.OnDoubleTapListener,
+    ScaleGestureDetector.OnScaleGestureListener {
+
+    private val size: Point by lazy {
+        val sizeValue = Point()
+        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val display = windowManager.defaultDisplay
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            // include navigation bar
+            display.getRealSize(sizeValue)
+        } else {
+            // exclude navigation bar
+            display.getSize(sizeValue)
+        }
+        sizeValue
+    }
 
     var bitmap: Bitmap? = null
         get() {
-            val metrics = resources.displayMetrics
-            val width = metrics.widthPixels
-            val height = metrics.heightPixels
+            val size = this.size
+            val width = size.x
+            val height = size.y
 
             val bitmapOld = field
             if (bitmapOld != null) {
@@ -82,7 +95,9 @@ class FractalsView : View,
     /**
      * The matrix for the bitmap.
      */
-    val bitmapMatrix = Matrix()
+    private val bitmapMatrix = Matrix()
+    private var measuredWidthDiff = 0f
+    private var measuredHeightDiff = 0f
 
     constructor(context: Context) : super(context) {
         init(context)
@@ -101,16 +116,20 @@ class FractalsView : View,
         scaleGestureDetector = ScaleGestureDetector(context, this)
     }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        val b = bitmap ?: return
+        measuredWidthDiff = (w - b.width) / 2f
+        measuredHeightDiff = (h - b.height) / 2f
+    }
+
     override fun clear() {
         bitmapMatrix.reset()
     }
 
     override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-        val b = bitmap!!
-        val dx = (measuredWidth - b.width) / 2f
-        val dy = (measuredHeight - b.height) / 2f
-        canvas.drawBitmap(b, dx, dy, null)
+        val b = bitmap ?: return
+        canvas.drawBitmap(b, measuredWidthDiff, measuredHeightDiff, null)
     }
 
     override fun start(delay: Long) {
@@ -120,8 +139,8 @@ class FractalsView : View,
             task = t
             t.startDelay = delay
             t.subscribeOn(Schedulers.computation())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(observer)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer)
         }
     }
 
@@ -169,13 +188,12 @@ class FractalsView : View,
             return
         }
 
-        val ss = state
-        super.onRestoreInstanceState(ss.superState)
+        super.onRestoreInstanceState(state.superState)
 
-        if (ss.values != null) {
+        if (state.values != null) {
             clear()
             val matrix = bitmapMatrix
-            matrix.setValues(ss.values)
+            matrix.setValues(state.values)
             restart()
         }
     }
