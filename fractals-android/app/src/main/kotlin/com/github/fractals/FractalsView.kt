@@ -290,27 +290,28 @@ class FractalsView : View,
 
         internal var values: FloatArray? = null
 
-        protected constructor(source: Parcel) : super(source) {
+        private constructor(source: Parcel) : super(source) {
             source.readFloatArray(values)
         }
 
-        constructor(superState: Parcelable) : super(superState) {}
+        constructor(superState: Parcelable) : super(superState)
 
         override fun writeToParcel(out: Parcel, flags: Int) {
             super.writeToParcel(out, flags)
             out.writeFloatArray(values)
         }
 
-        companion object {
+        override fun describeContents(): Int {
+            return 0
+        }
 
-            val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
-                override fun createFromParcel(p: Parcel): SavedState {
-                    return SavedState(p)
-                }
+        companion object CREATOR : Parcelable.Creator<SavedState> {
+            override fun createFromParcel(parcel: Parcel): SavedState {
+                return SavedState(parcel)
+            }
 
-                override fun newArray(size: Int): Array<SavedState?> {
-                    return arrayOfNulls(size)
-                }
+            override fun newArray(size: Int): Array<SavedState?> {
+                return arrayOfNulls(size)
             }
         }
     }
