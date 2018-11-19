@@ -44,16 +44,14 @@ class WallpaperView(context: Context, listener: WallpaperListener) :
     private var bitmap: Bitmap? = null
     private var task: FractalTask? = null
     private var listener: WallpaperListener? = null
-    private val gestureDetector: GestureDetector
-    var idle = false
-        private set
+    private val gestureDetector: GestureDetector = GestureDetector(context, this)
+    private var idle = false
     /**
      * The matrix for the bitmap.
      */
     val bitmapMatrix = Matrix()
 
     init {
-        gestureDetector = GestureDetector(context, this)
         setWallpaperListener(listener)
     }
 
