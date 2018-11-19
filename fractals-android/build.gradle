@@ -26,7 +26,7 @@ task clean(type: Delete) {
 
 ext {
     androidBuildSdkVersion = 28
-    androidBuildMinSdkVersion = 16
+    androidBuildMinSdkVersion = 21
     androidBuildTargetSdkVersion = 28
     supportVersion = '28.0.0'
 }
