@@ -20,7 +20,6 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.Point
-import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
@@ -46,13 +45,8 @@ class FractalsView : View,
         val sizeValue = Point()
         val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val display = windowManager.defaultDisplay
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            // include navigation bar
-            display.getRealSize(sizeValue)
-        } else {
-            // exclude navigation bar
-            display.getSize(sizeValue)
-        }
+        // include navigation bar
+        display.getRealSize(sizeValue)
         sizeValue
     }
 
@@ -83,6 +77,7 @@ class FractalsView : View,
             }
             return field
         }
+        private set
     private var task: FractalTask? = null
     private var listener: FractalsListener? = null
     private lateinit var gestureDetector: GestureDetector

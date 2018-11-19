@@ -24,7 +24,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build.VERSION
+import android.os.Build
 import android.os.Build.VERSION_CODES
 import android.support.v4.app.NotificationCompat
 import io.reactivex.Observer
@@ -67,7 +67,7 @@ class SaveFileObserver(val context: Context, val bitmap: Bitmap) : Observer<Uri>
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
         val pendingIntent = PendingIntent.getActivity(context, REQUEST_APP, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-        if (VERSION.SDK_INT >= VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             initChannels(nm)
         }
         builder = NotificationCompat.Builder(context, CHANNEL_ID)
