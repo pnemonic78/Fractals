@@ -24,7 +24,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.WindowManager
 import android.widget.Toast
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -114,7 +113,7 @@ class MainActivity : Activity(),
         menuSave!!.isEnabled = false
 
         val context = this
-        val bitmap = mainView.bitmap!!
+        val bitmap = mainView.bitmap
         val task = SaveFileTask(context, bitmap)
         task.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
