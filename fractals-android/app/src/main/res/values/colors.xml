@@ -1,3 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="bg_window">#ffcc0000</color>
+    <color name="action_bar">#20000000</color>
+    <color name="action_popup_menu_item">#ffaa0000</color>
 </resources>

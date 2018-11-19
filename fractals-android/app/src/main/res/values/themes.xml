@@ -3,6 +3,17 @@
 
     <!-- Base application theme. -->
     <style name="Theme.Fractals" parent="android:Theme.DeviceDefault.Light">
+        <item name="android:colorBackground">@color/bg_window</item>
+        <item name="android:windowBackground">@color/bg_window</item>
+        <!-- Translucent action bar -->
+        <item name="android:actionBarStyle">@style/Widget.Fractals.ActionBar</item>
+        <item name="android:itemBackground">@color/action_popup_menu_item</item>
+        <item name="android:itemTextAppearance">?android:textAppearanceMediumInverse</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <!-- Translucent status bar -->
+        <item name="android:windowTranslucentStatus">true</item>
+        <!-- Translucent navigation bar -->
+        <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
 </resources>

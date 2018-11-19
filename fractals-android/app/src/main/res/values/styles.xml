@@ -1,3 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <style name="Widget.Fractals.ActionBar" parent="android:Widget.DeviceDefault.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/action_bar</item>
+        <item name="android:displayOptions">showTitle</item>
+    </style>
+
 </resources>
