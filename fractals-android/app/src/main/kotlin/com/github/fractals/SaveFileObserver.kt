@@ -38,15 +38,6 @@ import io.reactivex.internal.disposables.DisposableHelper
  */
 class SaveFileObserver(val context: Context, val bitmap: Bitmap) : Observer<Uri> {
 
-    private val REQUEST_APP = 0x0466 // "APP"
-    private val REQUEST_VIEW = 0x7133 // "VIEW"
-
-    private val ID_NOTIFY = 0x5473 // "SAVE"
-
-    private val CHANNEL_ID = "save_file"
-
-    private val IMAGE_MIME = SaveFileTask.IMAGE_MIME
-
     private var disposable: Disposable? = null
     private val nm: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     private lateinit var builder: NotificationCompat.Builder
@@ -130,5 +121,16 @@ class SaveFileObserver(val context: Context, val bitmap: Bitmap) : Observer<Uri>
             channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             nm.createNotificationChannel(channel)
         }
+    }
+
+    companion object {
+        private const val REQUEST_APP = 0x0466 // "APP"
+        private const val REQUEST_VIEW = 0x7133 // "VIEW"
+
+        private const val ID_NOTIFY = 0x5473 // "SAVE"
+
+        private const val CHANNEL_ID = "save_file"
+
+        private const val IMAGE_MIME = SaveFileTask.IMAGE_MIME
     }
 }

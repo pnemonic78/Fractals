@@ -18,6 +18,7 @@ package com.github.fractals
 import android.Manifest
 import android.annotation.TargetApi
 import android.app.Activity
+import android.content.Context
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
 import android.os.Bundle
@@ -36,8 +37,6 @@ import io.reactivex.schedulers.Schedulers
  */
 class MainActivity : Activity(),
     FractalsListener {
-
-    private val REQUEST_SAVE = 1
 
     private lateinit var mainView: FractalsView
     private val disposables = CompositeDisposable()
@@ -112,7 +111,7 @@ class MainActivity : Activity(),
         }
         menuSave!!.isEnabled = false
 
-        val context = this
+        val context: Context = this
         val bitmap = mainView.bitmap
         val task = SaveFileTask(context, bitmap)
         task.subscribeOn(Schedulers.io())
@@ -223,5 +222,9 @@ class MainActivity : Activity(),
     override fun onResume() {
         super.onResume()
         start()
+    }
+
+    companion object {
+        private const val REQUEST_SAVE = 0x5473 // "SAVE"
     }
 }

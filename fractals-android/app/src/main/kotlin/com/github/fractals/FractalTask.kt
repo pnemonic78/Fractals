@@ -15,7 +15,6 @@
  */
 package com.github.fractals
 
-import android.content.ContentValues.TAG
 import android.graphics.*
 import android.os.SystemClock
 import android.util.Log
@@ -30,12 +29,6 @@ import java.lang.Thread.sleep
  * @author Moshe Waisberg
  */
 class FractalTask(private val matrix: Matrix, private val bitmap: Bitmap, private val hues: Double = DEFAULT_HUES) : Observable<Bitmap>(), Disposable {
-
-    companion object {
-
-        const val DEFAULT_HUES = 360.0
-
-    }
 
     private var runner: FractalRunner? = null
     var brightness = 1f
@@ -72,20 +65,13 @@ class FractalTask(private val matrix: Matrix, private val bitmap: Bitmap, privat
         runner?.dispose()
     }
 
+    fun isIdle(): Boolean = (runner == null) || !runner!!.running || isDisposed
+
+    fun cancel() {
+        dispose()
+    }
 
     private class FractalRunner(val matrix: Matrix, val bitmap: Bitmap, val hues: Double, val observer: Observer<in Bitmap>) : DefaultDisposable() {
-
-        private val RE_MIN = -2.0
-        private val RE_MAX = -RE_MIN
-        private val RE_SIZE = RE_MAX - RE_MIN
-        private val IM_MIN = RE_MIN
-        private val IM_MAX = -IM_MIN
-        private val IM_SIZE = IM_MAX - IM_MIN
-
-        private val LOG2 = Math.log(2.0)
-        private val LOG2_LOG2 = Math.log(LOG2) / LOG2
-        private val LOG2_LOG2_2 = 2.0 + LOG2_LOG2
-        private val OVERFLOW = 300
 
         private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
         private val rect = RectF()
@@ -116,7 +102,6 @@ class FractalTask(private val matrix: Matrix, private val bitmap: Bitmap, privat
                 strokeWidth = 1f
             }
         }
-
 
         fun run() {
             running = true
@@ -283,11 +268,25 @@ class FractalTask(private val matrix: Matrix, private val bitmap: Bitmap, privat
 
         override fun onDispose() {
         }
+
+        companion object {
+            private const val TAG = "FractalRunner"
+
+            private const val RE_MIN = -2.0
+            private const val RE_MAX = -RE_MIN
+            private const val RE_SIZE = RE_MAX - RE_MIN
+            private const val IM_MIN = RE_MIN
+            private const val IM_MAX = -IM_MIN
+            private const val IM_SIZE = IM_MAX - IM_MIN
+
+            private val LOG2 = Math.log(2.0)
+            private val LOG2_LOG2 = Math.log(LOG2) / LOG2
+            private val LOG2_LOG2_2 = 2.0 + LOG2_LOG2
+            private const val OVERFLOW = 300
+        }
     }
 
-    fun isIdle(): Boolean = (runner == null) || !runner!!.running || isDisposed
-
-    fun cancel() {
-        dispose()
+    companion object {
+        const val DEFAULT_HUES = 360.0
     }
 }

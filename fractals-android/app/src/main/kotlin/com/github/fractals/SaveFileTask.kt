@@ -62,11 +62,6 @@ class SaveFileTask(private val context: Context, private val bitmap: Bitmap) : O
 
     private class SaveFileRunner(val context: Context, val bitmap: Bitmap, val observer: Observer<in Uri>) : DefaultDisposable() {
 
-        private val TAG = "SaveFileTask"
-
-        private val IMAGE_EXT = ".png"
-        private val SCHEME_FILE = "file"
-
         private val timestampFormat = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US)
 
         fun run() {
@@ -119,6 +114,13 @@ class SaveFileTask(private val context: Context, private val bitmap: Bitmap) : O
 
         fun generateFileName(): String {
             return "fractal-" + timestampFormat.format(Date()) + IMAGE_EXT
+        }
+
+        companion object {
+            private const val TAG = "SaveFileTask"
+
+            private const val IMAGE_EXT = ".png"
+            private const val SCHEME_FILE = "file"
         }
     }
 }
