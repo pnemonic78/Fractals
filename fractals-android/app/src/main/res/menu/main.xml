@@ -8,7 +8,7 @@
         android:title="@string/menu_fullscreen"/>
     <item
         android:id="@+id/menu_stop"
-        android:enabled="false"
+        android:visible="false"
         android:icon="@drawable/ic_menu_stop"
         android:showAsAction="always"
         android:title="@string/menu_stop"/>
