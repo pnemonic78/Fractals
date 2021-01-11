@@ -26,9 +26,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 /**
  * Main activity.
@@ -47,13 +47,13 @@ class MainActivity : Activity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         mainView = findViewById(R.id.fractals)
-        mainView.setElectricFieldsListener(this)
+        mainView.setFractalsListener(this)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         mainView.stop()
-        disposables.dispose()
+        disposables.clear()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -62,10 +62,10 @@ class MainActivity : Activity(),
         val rendering = !mainView.isIdle()
 
         menuStop = menu.findItem(R.id.menu_stop)
-        menuStop!!.isEnabled = rendering
+        menuStop!!.isVisible = rendering
 
         menuSave = menu.findItem(R.id.menu_save_file)
-        menuSave!!.isEnabled = rendering
+        menuSave!!.isVisible = rendering
 
         return true
     }
@@ -106,18 +106,20 @@ class MainActivity : Activity(),
         }
 
         // Busy saving?
-        if ((menuSave == null) || !menuSave!!.isEnabled) {
+        val menuItem = menuSave ?: return
+        if (!menuItem.isVisible) {
             return
         }
-        menuSave!!.isEnabled = false
+        menuItem.isVisible = false
 
         val context: Context = this
         val bitmap = mainView.bitmap
-        val task = SaveFileTask(context, bitmap)
-        task.subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(SaveFileObserver(context, bitmap))
-        disposables.add(task)
+        SaveFileTask(context, bitmap).apply {
+            subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(SaveFileObserver(context, bitmap))
+            disposables.add(this)
+        }
     }
 
     override fun onRenderFieldPan(view: Fractals, dx: Int, dy: Int) {
@@ -129,8 +131,8 @@ class MainActivity : Activity(),
     override fun onRenderFieldStarted(view: Fractals) {
         if (view == mainView) {
             runOnUiThread {
-                menuStop?.isEnabled = true
-                menuSave?.isEnabled = true
+                menuStop?.isVisible = true
+                menuSave?.isVisible = true
             }
         }
     }
@@ -138,8 +140,8 @@ class MainActivity : Activity(),
     override fun onRenderFieldFinished(view: Fractals) {
         if (view == mainView) {
             runOnUiThread {
-                menuStop?.isEnabled = false
-                menuSave?.isEnabled = true
+                menuStop?.isVisible = false
+                menuSave?.isVisible = true
                 Toast.makeText(this, R.string.finished, Toast.LENGTH_SHORT).show()
             }
         }
@@ -148,7 +150,7 @@ class MainActivity : Activity(),
     override fun onRenderFieldCancelled(view: Fractals) {
         if (view == mainView) {
             runOnUiThread {
-                menuStop?.isEnabled = false
+                menuStop?.isVisible = false
             }
         }
     }
@@ -176,6 +178,7 @@ class MainActivity : Activity(),
         if ((actionBar != null) && actionBar.isShowing) {
             // Hide the status bar.
             window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_FULLSCREEN)
 
@@ -194,7 +197,8 @@ class MainActivity : Activity(),
         val actionBar = actionBar
         if (actionBar != null && !actionBar.isShowing) {
             // Show the status bar.
-            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_IMMERSIVE
+            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
 
             // Show the action bar.
             actionBar.show()
@@ -211,6 +215,7 @@ class MainActivity : Activity(),
     }
 
     private fun stop() {
+        menuStop?.isVisible = false
         mainView.stop()
         mainView.clear()
     }

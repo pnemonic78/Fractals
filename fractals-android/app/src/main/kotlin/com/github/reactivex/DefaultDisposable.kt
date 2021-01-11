@@ -15,7 +15,7 @@
  */
 package com.github.reactivex
 
-import io.reactivex.disposables.Disposable
+import io.reactivex.rxjava3.disposables.Disposable
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -24,14 +24,14 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 abstract class DefaultDisposable : Disposable {
 
-    private val disposed = AtomicBoolean()
+    private val isDisposed = AtomicBoolean()
 
     override fun isDisposed(): Boolean {
-        return disposed.get()
+        return isDisposed.get()
     }
 
     override fun dispose() {
-        if (disposed.compareAndSet(false, true)) {
+        if (isDisposed.compareAndSet(false, true)) {
             onDispose()
         }
     }

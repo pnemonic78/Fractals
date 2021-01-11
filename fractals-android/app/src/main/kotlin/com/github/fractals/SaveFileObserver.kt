@@ -26,17 +26,17 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION_CODES
-import android.support.v4.app.NotificationCompat
-import io.reactivex.Observer
-import io.reactivex.disposables.Disposable
-import io.reactivex.internal.disposables.DisposableHelper
+import androidx.core.app.NotificationCompat
+import io.reactivex.rxjava3.core.Observer
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.internal.disposables.DisposableHelper
 
 /**
  * Task to save a bitmap to a file.
  *
  * @author Moshe Waisberg
  */
-class SaveFileObserver(val context: Context, val bitmap: Bitmap) : Observer<Uri> {
+class SaveFileObserver(private val context: Context, private val bitmap: Bitmap) : Observer<Uri> {
 
     private var disposable: Disposable? = null
     private val nm: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -62,14 +62,14 @@ class SaveFileObserver(val context: Context, val bitmap: Bitmap) : Observer<Uri>
             initChannels(nm)
         }
         builder = NotificationCompat.Builder(context, CHANNEL_ID)
-                .setCategory(NotificationCompat.CATEGORY_PROGRESS)
-                .setContentTitle(context.getText(R.string.saving_title))
-                .setContentText(context.getText(R.string.saving_text))
-                .setContentIntent(pendingIntent)
-                .setSmallIcon(R.drawable.stat_notify)
-                .setLargeIcon(largeIcon)
-                .setAutoCancel(true)
-                .setOngoing(true)
+            .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+            .setContentTitle(context.getText(R.string.saving_title))
+            .setContentText(context.getText(R.string.saving_text))
+            .setContentIntent(pendingIntent)
+            .setSmallIcon(R.drawable.stat_notify)
+            .setLargeIcon(largeIcon)
+            .setAutoCancel(true)
+            .setOngoing(true)
 
         nm.notify(ID_NOTIFY, builder.build())
     }
@@ -82,8 +82,8 @@ class SaveFileObserver(val context: Context, val bitmap: Bitmap) : Observer<Uri>
         val pendingIntent = PendingIntent.getActivity(context, REQUEST_VIEW, intent, FLAG_UPDATE_CURRENT)
 
         builder.setContentTitle(context.getText(R.string.saved_title))
-                .setContentText(context.getText(R.string.saved_text))
-                .setContentIntent(pendingIntent)
+            .setContentText(context.getText(R.string.saved_text))
+            .setContentIntent(pendingIntent)
 
         nm.notify(ID_NOTIFY, builder.build())
     }

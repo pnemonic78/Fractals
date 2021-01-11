@@ -24,10 +24,9 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.*
-import io.reactivex.Observer
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.core.Observer
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 /**
  * Fractals view.
@@ -50,16 +49,16 @@ class FractalsView : View,
         sizeValue
     }
 
-    private var bitmapValue: Bitmap? = null
+    private var _bitmap: Bitmap? = null
     val bitmap: Bitmap
         get() {
-            if (bitmapValue == null) {
+            if (_bitmap == null) {
                 val size = this.size
                 val width = size.x
                 val height = size.y
-                bitmapValue = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                _bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
             }
-            return bitmapValue!!
+            return _bitmap!!
         }
     private var task: FractalTask? = null
     private var listener: FractalsListener? = null
@@ -70,6 +69,7 @@ class FractalsView : View,
     private var zoomViewing = 1f
     private var scrolling: Boolean = false
     private var scaling: Boolean = false
+
     /**
      * The matrix for the bitmap.
      */
@@ -111,12 +111,12 @@ class FractalsView : View,
     override fun start(delay: Long) {
         if (isIdle()) {
             val observer = this
-            val t = FractalTask(bitmapMatrix, bitmap)
-            task = t
-            t.startDelay = delay
-            t.subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(observer)
+            FractalTask(bitmapMatrix, bitmap).apply {
+                task = this
+                startDelay = delay
+                subscribeOn(Schedulers.computation())
+                    .subscribe(observer)
+            }
         }
     }
 
@@ -124,38 +124,26 @@ class FractalsView : View,
         task?.cancel()
     }
 
-    override fun onNext(value: Bitmap) {
-        postInvalidate()
-    }
-
-    override fun onError(e: Throwable) {
-        listener?.onRenderFieldCancelled(this)
-    }
-
-    override fun onComplete() {
-        listener?.onRenderFieldFinished(this)
-        clear()
-    }
-
-    override fun onSubscribe(d: Disposable) {
-        listener?.onRenderFieldStarted(this)
-    }
-
     /**
      * Set the listener for events.
+     *
      * @param listener the listener.
      */
-    fun setElectricFieldsListener(listener: FractalsListener) {
+    fun setFractalsListener(listener: FractalsListener) {
         this.listener = listener
     }
 
-    override fun onSaveInstanceState(): Parcelable {
+    override fun onSaveInstanceState(): Parcelable? {
         val superState = super.onSaveInstanceState()
 
-        val ss = SavedState(superState)
-        ss.values = FloatArray(9)
-        bitmapMatrix.getValues(ss.values)
-        return ss
+        if (superState != null) {
+            val ss = SavedState(superState)
+            ss.values = FloatArray(9)
+            bitmapMatrix.getValues(ss.values)
+            return ss
+        }
+
+        return superState
     }
 
     public override fun onRestoreInstanceState(state: Parcelable) {
@@ -280,12 +268,36 @@ class FractalsView : View,
         return false
     }
 
-    class SavedState : View.BaseSavedState {
+    override fun onNext(value: Bitmap) {
+        postInvalidate()
+    }
+
+    override fun onError(e: Throwable) {
+        listener?.onRenderFieldCancelled(this)
+    }
+
+    override fun onComplete() {
+        listener?.onRenderFieldFinished(this)
+        clear()
+    }
+
+    override fun onSubscribe(d: Disposable) {
+        listener?.onRenderFieldStarted(this)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        _bitmap?.recycle()
+        _bitmap = null
+    }
+
+    class SavedState : BaseSavedState {
 
         internal var values: FloatArray? = null
 
         private constructor(source: Parcel) : super(source) {
-            source.readFloatArray(values)
+            values = FloatArray(9)
+            source.readFloatArray(values!!)
         }
 
         constructor(superState: Parcelable) : super(superState)
