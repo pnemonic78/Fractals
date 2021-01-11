@@ -26,9 +26,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 /**
  * Main activity.
@@ -53,7 +53,7 @@ class MainActivity : Activity(),
     override fun onDestroy() {
         super.onDestroy()
         mainView.stop()
-        disposables.dispose()
+        disposables.clear()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

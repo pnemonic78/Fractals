@@ -72,7 +72,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlinVersion}")
 
     // Rx
-    implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
+    implementation("io.reactivex.rxjava3:rxandroid:3.0.0")
 
     // AndroidX
     implementation("androidx.core:core-ktx:1.3.2")

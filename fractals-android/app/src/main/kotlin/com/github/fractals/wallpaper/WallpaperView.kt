@@ -23,9 +23,9 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import com.github.fractals.FractalTask
 import com.github.fractals.Fractals
-import io.reactivex.Observer
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.core.Observer
+import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 /**
  * Live wallpaper view.
