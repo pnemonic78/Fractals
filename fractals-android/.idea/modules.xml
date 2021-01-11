@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/fractals-android.iml" filepath="$PROJECT_DIR$/fractals-android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Fractals.iml" filepath="$PROJECT_DIR$/.idea/modules/Fractals.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Fractals.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Fractals.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Fractals.buildSrc.iml" filepath="$PROJECT_DIR$/.idea/modules/Fractals.buildSrc.iml" />
     </modules>
   </component>
 </project>

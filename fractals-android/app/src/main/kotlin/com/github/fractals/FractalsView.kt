@@ -149,13 +149,17 @@ class FractalsView : View,
         this.listener = listener
     }
 
-    override fun onSaveInstanceState(): Parcelable {
+    override fun onSaveInstanceState(): Parcelable? {
         val superState = super.onSaveInstanceState()
 
-        val ss = SavedState(superState)
-        ss.values = FloatArray(9)
-        bitmapMatrix.getValues(ss.values)
-        return ss
+        if (superState != null) {
+            val ss = SavedState(superState)
+            ss.values = FloatArray(9)
+            bitmapMatrix.getValues(ss.values)
+            return ss
+        }
+
+        return superState
     }
 
     public override fun onRestoreInstanceState(state: Parcelable) {
@@ -280,12 +284,13 @@ class FractalsView : View,
         return false
     }
 
-    class SavedState : View.BaseSavedState {
+    class SavedState : BaseSavedState {
 
         internal var values: FloatArray? = null
 
         private constructor(source: Parcel) : super(source) {
-            source.readFloatArray(values)
+            values = FloatArray(9)
+            source.readFloatArray(values!!)
         }
 
         constructor(superState: Parcelable) : super(superState)

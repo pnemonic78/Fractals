@@ -26,7 +26,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION_CODES
-import android.support.v4.app.NotificationCompat
+import androidx.core.app.NotificationCompat
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import io.reactivex.internal.disposables.DisposableHelper
