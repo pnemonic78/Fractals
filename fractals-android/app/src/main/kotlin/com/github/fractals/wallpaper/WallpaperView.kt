@@ -29,13 +29,14 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 
 /**
  * Live wallpaper view.
+ *
  * @author Moshe Waisberg
  */
 class WallpaperView(context: Context, listener: WallpaperListener) :
-        Fractals,
-        Observer<Bitmap>,
-        GestureDetector.OnGestureListener,
-        GestureDetector.OnDoubleTapListener {
+    Fractals,
+    Observer<Bitmap>,
+    GestureDetector.OnGestureListener,
+    GestureDetector.OnDoubleTapListener {
 
     var width: Int = 0
         private set
@@ -45,7 +46,8 @@ class WallpaperView(context: Context, listener: WallpaperListener) :
     private var task: FractalTask? = null
     private var listener: WallpaperListener? = null
     private val gestureDetector: GestureDetector = GestureDetector(context, this)
-    private var idle = false
+    private var isIdle = false
+
     /**
      * The matrix for the bitmap.
      */
@@ -60,43 +62,26 @@ class WallpaperView(context: Context, listener: WallpaperListener) :
     }
 
     override fun start(delay: Long) {
-        if (idle) {
+        if (isIdle) {
             val observer = this
-            val t = FractalTask(bitmapMatrix, bitmap!!)
-            task = t
-            with(t) {
+            FractalTask(bitmapMatrix, bitmap!!).apply {
+                task = this
                 saturation = 0.5f
                 brightness = 0.5f
                 startDelay = delay
                 subscribeOn(Schedulers.computation())
-                        .subscribe(observer)
+                    .subscribe(observer)
             }
         }
     }
 
     override fun stop() {
         task?.cancel()
-        idle = true
+        isIdle = true
     }
 
-    override fun onNext(value: Bitmap) {
-        invalidate()
-    }
-
-    override fun onError(e: Throwable) {
-        idle = true
-        listener?.onRenderFieldCancelled(this)
-    }
-
-    override fun onComplete() {
-        idle = true
-        listener?.onRenderFieldFinished(this)
-        clear()
-    }
-
-    override fun onSubscribe(d: Disposable) {
-        idle = false
-        listener?.onRenderFieldStarted(this)
+    fun onTouchEvent(event: MotionEvent) {
+        gestureDetector.onTouchEvent(event)
     }
 
     override fun onDoubleTap(e: MotionEvent): Boolean {
@@ -131,6 +116,25 @@ class WallpaperView(context: Context, listener: WallpaperListener) :
         return false
     }
 
+    override fun onNext(value: Bitmap) {
+        invalidate()
+    }
+
+    override fun onError(e: Throwable) {
+        isIdle = true
+        listener?.onRenderFieldCancelled(this)
+    }
+
+    override fun onComplete() {
+        isIdle = true
+        listener?.onRenderFieldFinished(this)
+    }
+
+    override fun onSubscribe(d: Disposable) {
+        isIdle = false
+        listener?.onRenderFieldStarted(this)
+    }
+
     /**
      * Set the listener for events.
      *
@@ -162,7 +166,9 @@ class WallpaperView(context: Context, listener: WallpaperListener) :
                     m.postRotate(270f, bw / 2f, bh / 2f)
                 }
                 val rotated = Bitmap.createBitmap(bitmapOld, 0, 0, bw, bh, m, true)
+                if (rotated !== bitmapOld) bitmapOld.recycle()
                 bitmap = Bitmap.createScaledBitmap(rotated, width, height, true)
+                if (rotated !== bitmap) rotated.recycle()
             }
         } else {
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
@@ -173,11 +179,12 @@ class WallpaperView(context: Context, listener: WallpaperListener) :
         onDraw(canvas)
     }
 
-    protected fun onDraw(canvas: Canvas) {
+    private fun onDraw(canvas: Canvas) {
         canvas.drawBitmap(bitmap!!, 0f, 0f, null)
     }
 
-    fun onTouchEvent(event: MotionEvent) {
-        gestureDetector.onTouchEvent(event)
+    fun onDestroy() {
+        bitmap?.recycle()
+        bitmap = null
     }
 }

@@ -154,7 +154,7 @@ class SaveFileTask(private val context: Context, private val bitmap: Bitmap) : O
         }
 
         fun generateFileName(): String {
-            return "ef-" + timestampFormat.format(Date()) + IMAGE_EXT
+            return "fractal-" + timestampFormat.format(Date()) + IMAGE_EXT
         }
 
         companion object {

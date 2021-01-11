@@ -47,7 +47,7 @@ class MainActivity : Activity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         mainView = findViewById(R.id.fractals)
-        mainView.setElectricFieldsListener(this)
+        mainView.setFractalsListener(this)
     }
 
     override fun onDestroy() {
@@ -114,11 +114,12 @@ class MainActivity : Activity(),
 
         val context: Context = this
         val bitmap = mainView.bitmap
-        val task = SaveFileTask(context, bitmap)
-        task.subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(SaveFileObserver(context, bitmap))
-        disposables.add(task)
+        SaveFileTask(context, bitmap).apply {
+            subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(SaveFileObserver(context, bitmap))
+            disposables.add(this)
+        }
     }
 
     override fun onRenderFieldPan(view: Fractals, dx: Int, dy: Int) {
@@ -177,6 +178,7 @@ class MainActivity : Activity(),
         if ((actionBar != null) && actionBar.isShowing) {
             // Hide the status bar.
             window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_FULLSCREEN)
 
@@ -195,7 +197,8 @@ class MainActivity : Activity(),
         val actionBar = actionBar
         if (actionBar != null && !actionBar.isShowing) {
             // Show the status bar.
-            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_IMMERSIVE
+            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
 
             // Show the action bar.
             actionBar.show()

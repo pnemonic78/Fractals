@@ -21,11 +21,13 @@ import android.text.format.DateUtils
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import com.github.fractals.Fractals
-import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.math.max
+import kotlin.random.Random
 
 /**
  * Fractals wallpaper service.
+ *
  * @author Moshe Waisberg
  */
 class FractalsWallpaperService : WallpaperService() {
@@ -40,61 +42,64 @@ class FractalsWallpaperService : WallpaperService() {
      */
     private inner class FractalsWallpaperEngine : WallpaperService.Engine(), WallpaperListener {
 
-        private lateinit var fieldsView: WallpaperView
-        private val random = Random()
-        private val drawing = AtomicBoolean()
+        private lateinit var mainView: WallpaperView
+        private val random = Random.Default
+        private val isDrawing = AtomicBoolean()
 
         override fun onCreate(surfaceHolder: SurfaceHolder) {
             super.onCreate(surfaceHolder)
             setTouchEventsEnabled(true)
 
             val context: Context = this@FractalsWallpaperService
-            fieldsView = WallpaperView(context, this)
+            mainView = WallpaperView(context, this)
         }
 
         override fun onDestroy() {
             super.onDestroy()
-            fieldsView.stop()
+            mainView.stop()
+            mainView.onDestroy()
         }
 
         override fun onSurfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-            fieldsView.setSize(width, height)
+            mainView.setSize(width, height)
             randomise()
         }
 
         override fun onSurfaceDestroyed(holder: SurfaceHolder) {
-            fieldsView.stop()
+            mainView.stop()
+            mainView.onDestroy()
         }
 
         override fun onSurfaceRedrawNeeded(holder: SurfaceHolder) {
-            draw()
+            draw(mainView)
         }
 
         override fun onTouchEvent(event: MotionEvent) {
-            fieldsView.onTouchEvent(event)
+            mainView.onTouchEvent(event)
         }
 
         override fun onVisibilityChanged(visible: Boolean) {
             if (visible) {
-                fieldsView.start()
+                mainView.start()
             } else {
-                fieldsView.stop()
+                mainView.stop()
             }
         }
 
         /**
-         * Add random charges.
+         * Add random zoom and pan.
          * @param delay the start delay, in milliseconds.
          */
         private fun randomise(delay: Long = 0L) {
-            fieldsView.clear()
-            val x = (if (random.nextBoolean()) +0.25f else -0.25f) * random.nextFloat() * fieldsView.width.toFloat()
-            val y = (if (random.nextBoolean()) +0.25f else -0.25f) * random.nextFloat() * fieldsView.height.toFloat()
-            val z = Math.max(0.25f, random.nextFloat() * 5f)
-            val matrix = fieldsView.bitmapMatrix
+            mainView.clear()
+            val f = random.nextDouble(-0.25, 0.25).toFloat()
+            val x = f * mainView.width.toFloat()
+            val y = f * mainView.height.toFloat()
+            val z = max(0.5f, f * 100f)
+            val matrix = mainView.bitmapMatrix
             matrix.preTranslate(x, y)
             matrix.postScale(z, z)
-            fieldsView.restart(delay)
+            mainView.restart(delay)
         }
 
         override fun onRenderFieldPan(view: Fractals, dx: Int, dy: Int) {
@@ -108,7 +113,7 @@ class FractalsWallpaperService : WallpaperService() {
         override fun onRenderFieldStarted(view: Fractals) {}
 
         override fun onRenderFieldFinished(view: Fractals) {
-            if (view === fieldsView) {
+            if (view === mainView) {
                 randomise(DELAY)
             }
         }
@@ -116,22 +121,22 @@ class FractalsWallpaperService : WallpaperService() {
         override fun onRenderFieldCancelled(view: Fractals) {}
 
         override fun onDraw(view: WallpaperView) {
-            if (view === fieldsView) {
-                draw()
+            if (view === mainView) {
+                draw(view)
             }
         }
 
-        fun draw() {
-            if (!drawing.compareAndSet(false, true)) {
+        fun draw(view: WallpaperView) {
+            if (!isDrawing.compareAndSet(false, true)) {
                 return
             }
-            val surfaceHolder = surfaceHolder
+            val surfaceHolder = this.surfaceHolder
             if (surfaceHolder.surface.isValid) {
                 try {
                     val canvas = surfaceHolder.lockCanvas()
                     if (canvas != null) {
                         try {
-                            fieldsView.draw(canvas)
+                            view.draw(canvas)
                         } finally {
                             surfaceHolder.unlockCanvasAndPost(canvas)
                         }
@@ -140,7 +145,7 @@ class FractalsWallpaperService : WallpaperService() {
                     e.printStackTrace()
                 }
             }
-            drawing.set(false)
+            isDrawing.set(false)
         }
     }
 

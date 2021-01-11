@@ -49,16 +49,16 @@ class FractalsView : View,
         sizeValue
     }
 
-    private var bitmapValue: Bitmap? = null
+    private var _bitmap: Bitmap? = null
     val bitmap: Bitmap
         get() {
-            if (bitmapValue == null) {
+            if (_bitmap == null) {
                 val size = this.size
                 val width = size.x
                 val height = size.y
-                bitmapValue = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                _bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
             }
-            return bitmapValue!!
+            return _bitmap!!
         }
     private var task: FractalTask? = null
     private var listener: FractalsListener? = null
@@ -69,6 +69,7 @@ class FractalsView : View,
     private var zoomViewing = 1f
     private var scrolling: Boolean = false
     private var scaling: Boolean = false
+
     /**
      * The matrix for the bitmap.
      */
@@ -110,11 +111,12 @@ class FractalsView : View,
     override fun start(delay: Long) {
         if (isIdle()) {
             val observer = this
-            val t = FractalTask(bitmapMatrix, bitmap)
-            task = t
-            t.startDelay = delay
-            t.subscribeOn(Schedulers.computation())
-                .subscribe(observer)
+            FractalTask(bitmapMatrix, bitmap).apply {
+                task = this
+                startDelay = delay
+                subscribeOn(Schedulers.computation())
+                    .subscribe(observer)
+            }
         }
     }
 
@@ -122,28 +124,12 @@ class FractalsView : View,
         task?.cancel()
     }
 
-    override fun onNext(value: Bitmap) {
-        postInvalidate()
-    }
-
-    override fun onError(e: Throwable) {
-        listener?.onRenderFieldCancelled(this)
-    }
-
-    override fun onComplete() {
-        listener?.onRenderFieldFinished(this)
-        clear()
-    }
-
-    override fun onSubscribe(d: Disposable) {
-        listener?.onRenderFieldStarted(this)
-    }
-
     /**
      * Set the listener for events.
+     *
      * @param listener the listener.
      */
-    fun setElectricFieldsListener(listener: FractalsListener) {
+    fun setFractalsListener(listener: FractalsListener) {
         this.listener = listener
     }
 
@@ -280,6 +266,29 @@ class FractalsView : View,
 
     override fun onSingleTapUp(e: MotionEvent): Boolean {
         return false
+    }
+
+    override fun onNext(value: Bitmap) {
+        postInvalidate()
+    }
+
+    override fun onError(e: Throwable) {
+        listener?.onRenderFieldCancelled(this)
+    }
+
+    override fun onComplete() {
+        listener?.onRenderFieldFinished(this)
+        clear()
+    }
+
+    override fun onSubscribe(d: Disposable) {
+        listener?.onRenderFieldStarted(this)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        _bitmap?.recycle()
+        _bitmap = null
     }
 
     class SavedState : BaseSavedState {
