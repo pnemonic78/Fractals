@@ -5,12 +5,9 @@
     <!-- Notifications. -->
     <string name="finished">Tegning er færdig.</string>
 
-    <!-- Saved. -->
-    <string name="menu_save_file">Gem til fil</string>
-    <string name="saving_text">Gemme billede til fil…</string>
-    <string name="saved_title">Fraktaler gemmes.</string>
-    <string name="saved_text">Tryk for at se dine felter.</string>
-    <string name="save_failed">Kunne ikke gemme billede.</string>
+    <!-- Share. -->
+    <string name="sendImage" msgid="7279510542799399570">"Del billede via"</string>
+    <string name="share_failed">Kunne ikke gemme billede.</string>
 
     <!-- Menu. -->
     <string name="menu_fullscreen">Fuld skærm</string>

@@ -5,12 +5,9 @@
     <!-- Notifications. -->
     <string name="finished">Rajz befejeződött.</string>
 
-    <!-- Saved. -->
-    <string name="menu_save_file">Fájlba menteni</string>
-    <string name="saving_text">Kép mentése fájlba…</string>
-    <string name="saved_title">Fraktálok kerülnek.</string>
-    <string name="saved_text">Érintse meg az a mezőket.</string>
-    <string name="save_failed">Nem sikerült menteni a képet.</string>
+    <!-- Share. -->
+    <string name="sendImage" msgid="7279510542799399570">"Kép megosztása a következőn keresztül:"</string>
+    <string name="share_failed">Nem sikerült menteni a képet.</string>
 
     <!-- Menu. -->
     <string name="menu_fullscreen">Teljes képernyő</string>

@@ -5,12 +5,9 @@
     <!-- Notifications. -->
     <string name="finished">Piirustus on päättynyt.</string>
 
-    <!-- Saved. -->
-    <string name="menu_save_file">Tallenna tiedosto</string>
-    <string name="saving_text">Tallentaminen kuvan tiedostoon…</string>
-    <string name="saved_title">Fraktaalit tallennetaan.</string>
-    <string name="saved_text">Koskettamalla tarkastella kenttiä.</string>
-    <string name="save_failed">Tallennus epäonnistui kuvan.</string>
+    <!-- Share. -->
+    <string name="sendImage" msgid="7279510542799399570">"Jaa kuva"</string>
+    <string name="share_failed">Tallennus epäonnistui kuvan.</string>
 
     <!-- Menu. -->
     <string name="menu_fullscreen">Koko näyttö</string>

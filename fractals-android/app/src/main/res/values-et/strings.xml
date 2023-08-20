@@ -5,12 +5,9 @@
     <!-- Notifications. -->
     <string name="finished">Joonistus on lõppenud.</string>
 
-    <!-- Saved. -->
-    <string name="menu_save_file">Salvesta faili</string>
-    <string name="saving_text">Pildi salvestamine faili…</string>
-    <string name="saved_title">Fraktaale salvestatakse.</string>
-    <string name="saved_text">Puudutage, et vaadata oma valdkonnas.</string>
-    <string name="save_failed">Õnnestunud salvestada pilti.</string>
+    <!-- Share. -->
+    <string name="sendImage" msgid="7279510542799399570">"Pildi jagamine:"</string>
+    <string name="share_failed">Õnnestunud salvestada pilti.</string>
 
     <!-- Menu. -->
     <string name="menu_fullscreen">Täisekraan</string>

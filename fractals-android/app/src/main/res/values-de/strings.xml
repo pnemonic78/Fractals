@@ -5,12 +5,9 @@
     <!-- Notifications. -->
     <string name="finished">Zeichnung ist fertig.</string>
 
-    <!-- Saved. -->
-    <string name="menu_save_file">In Datei speichern</string>
-    <string name="saving_text">Bild wird gespeichert…</string>
-    <string name="saved_title">Fraktale werden gespeichert.</string>
-    <string name="saved_text">Berühren Sie, um Ihre Felder anzuzeigen.</string>
-    <string name="save_failed">Fehler beim Speichern des Bildes.</string>
+    <!-- Share. -->
+    <string name="sendImage" msgid="7279510542799399570">"Bild teilen über"</string>
+    <string name="share_failed">Fehler beim Speichern des Bildes.</string>
 
     <!-- Menu. -->
     <string name="menu_fullscreen">Vollbild</string>

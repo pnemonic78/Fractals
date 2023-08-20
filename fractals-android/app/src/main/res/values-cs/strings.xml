@@ -5,12 +5,9 @@
     <!-- Notifications. -->
     <string name="finished">Renderování je dokončen.</string>
 
-    <!-- Saved. -->
-    <string name="menu_save_file">Uložit do souboru</string>
-    <string name="saving_text">Uložení obrazu do souboru…</string>
-    <string name="saved_title">Fraktály jsou uloženy.</string>
-    <string name="saved_text">Dotykem zobrazit pole.</string>
-    <string name="save_failed">Nepodařilo se uložit obrázek.</string>
+    <!-- Share. -->
+    <string name="sendImage" msgid="7279510542799399570">"Sdílet fotografii pomocí"</string>
+    <string name="share_failed">Nepodařilo se uložit obrázek.</string>
 
     <!-- Menu. -->
     <string name="menu_fullscreen">Celá obrazovka</string>

@@ -5,12 +5,9 @@
     <!-- Notifications. -->
     <string name="finished">Tekening is voltooid.</string>
 
-    <!-- Saved. -->
-    <string name="menu_save_file">Opslaan naar bestand</string>
-    <string name="saving_text">Afbeeldingen opslaan naar bestand…</string>
-    <string name="saved_title">Fractals worden opgeslagen.</string>
-    <string name="saved_text">Raak aan om uw velden te bekijken.</string>
-    <string name="save_failed">Mislukt afbeelding op te slaan.</string>
+    <!-- Share. -->
+    <string name="sendImage" msgid="7279510542799399570">"Foto delen via"</string>
+    <string name="share_failed">Mislukt afbeelding op te slaan.</string>
 
     <!-- Menu. -->
     <string name="menu_fullscreen">Schermvullend</string>
