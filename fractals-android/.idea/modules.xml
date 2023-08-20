@@ -4,7 +4,12 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Fractals.iml" filepath="$PROJECT_DIR$/.idea/modules/Fractals.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Fractals.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Fractals.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Fractals.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Fractals.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Fractals.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Fractals.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Fractals.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Fractals.app.unitTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Fractals.buildSrc.iml" filepath="$PROJECT_DIR$/.idea/modules/Fractals.buildSrc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Fractals.buildSrc.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Fractals.buildSrc.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Fractals.buildSrc.test.iml" filepath="$PROJECT_DIR$/.idea/modules/Fractals.buildSrc.test.iml" />
     </modules>
   </component>
 </project>
