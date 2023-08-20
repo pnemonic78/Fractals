@@ -15,17 +15,18 @@
  */
 package com.github.fractals
 
-import android.Manifest
-import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Context
-import android.content.pm.PackageManager.PERMISSION_GRANTED
-import android.os.Build
+import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import com.github.reactivex.addTo
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -41,7 +42,7 @@ class MainActivity : Activity(),
     private lateinit var mainView: FractalsView
     private val disposables = CompositeDisposable()
     private var menuStop: MenuItem? = null
-    private var menuSave: MenuItem? = null
+    private var menuShare: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,11 +62,13 @@ class MainActivity : Activity(),
 
         val rendering = !mainView.isIdle()
 
-        menuStop = menu.findItem(R.id.menu_stop)
-        menuStop!!.isVisible = rendering
+        menuStop = menu.findItem(R.id.menu_stop).also {
+            it.isVisible = rendering
+        }
 
-        menuSave = menu.findItem(R.id.menu_save_file)
-        menuSave!!.isVisible = rendering
+        menuShare = menu.findItem(R.id.menu_share)?.also {
+            it.isEnabled = rendering
+        }
 
         return true
     }
@@ -76,6 +79,7 @@ class MainActivity : Activity(),
                 stop()
                 return true
             }
+
             R.id.menu_fullscreen -> {
                 if (actionBar?.isShowing == true) {
                     showFullscreen()
@@ -84,8 +88,9 @@ class MainActivity : Activity(),
                 }
                 return true
             }
-            R.id.menu_save_file -> {
-                saveToFile()
+
+            R.id.menu_share -> {
+                share(bitmap = mainView.bitmap)
                 return true
             }
         }
@@ -94,45 +99,44 @@ class MainActivity : Activity(),
     }
 
     /**
-     * Save the bitmap to a file.
+     * Save the bitmap to a file, and then share it.
      */
-    private fun saveToFile() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val activity: Activity = this@MainActivity
-            if (activity.checkCallingOrSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PERMISSION_GRANTED) {
-                activity.requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_SAVE)
-                return
-            }
-        }
-
-        // Busy saving?
-        val menuItem = menuSave ?: return
-        if (!menuItem.isVisible) {
+    private fun share(bitmap: Bitmap) {
+        // Busy sharing?
+        val menuItem = menuShare ?: return
+        if (!menuItem.isEnabled || !menuItem.isVisible) {
             return
         }
-        menuItem.isVisible = false
+        menuItem.isEnabled = false
 
         val context: Context = this
-        val bitmap = mainView.bitmap
-        SaveFileTask(context, bitmap).apply {
-            subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(SaveFileObserver(context, bitmap))
-            disposables.add(this)
-        }
+        SaveFileTask(context, bitmap)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ uri ->
+                Intent(Intent.ACTION_SEND).apply {
+                    putExtra(Intent.EXTRA_STREAM, uri)
+                    type = SaveFileTask.IMAGE_MIME
+                    startActivity(Intent.createChooser(this, getString(R.string.share_title)));
+                }
+                menuItem.isEnabled = true
+            }, { e ->
+                e.printStackTrace()
+                Toast.makeText(context, R.string.share_failed, Toast.LENGTH_LONG).show()
+                menuItem.isEnabled = true
+            })
+            .addTo(disposables)
     }
 
-    override fun onRenderFieldPan(view: Fractals, dx: Int, dy: Int) {
-    }
+    override fun onRenderFieldPan(view: Fractals, dx: Int, dy: Int) = Unit
 
-    override fun onRenderFieldZoom(view: Fractals, scale: Double) {
-    }
+    override fun onRenderFieldZoom(view: Fractals, scale: Double) = Unit
 
     override fun onRenderFieldStarted(view: Fractals) {
         if (view == mainView) {
             runOnUiThread {
                 menuStop?.isVisible = true
-                menuSave?.isVisible = true
+                menuShare?.isVisible = false
             }
         }
     }
@@ -141,7 +145,8 @@ class MainActivity : Activity(),
         if (view == mainView) {
             runOnUiThread {
                 menuStop?.isVisible = false
-                menuSave?.isVisible = true
+                menuShare?.isVisible = true
+                menuShare?.isEnabled = true
                 Toast.makeText(this, R.string.finished, Toast.LENGTH_SHORT).show()
             }
         }
@@ -155,20 +160,6 @@ class MainActivity : Activity(),
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode == REQUEST_SAVE) {
-            if (permissions.isNotEmpty() && (permissions[0] == Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                if (grantResults.isNotEmpty() && (grantResults[0] == PERMISSION_GRANTED)) {
-                    saveToFile()
-                    return
-                }
-            }
-        }
-    }
-
     /**
      * Maximise the image in fullscreen mode.
      * @return `true` if screen is now fullscreen.
@@ -176,11 +167,12 @@ class MainActivity : Activity(),
     private fun showFullscreen(): Boolean {
         val actionBar = actionBar
         if ((actionBar != null) && actionBar.isShowing) {
-            // Hide the status bar.
-            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
-                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_FULLSCREEN)
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+            WindowInsetsControllerCompat(window, window.decorView).also { controller ->
+                controller.hide(WindowInsetsCompat.Type.systemBars())
+                controller.systemBarsBehavior =
+                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
 
             // Hide the action bar.
             actionBar.hide()
@@ -196,9 +188,10 @@ class MainActivity : Activity(),
     private fun showNormalScreen(): Boolean {
         val actionBar = actionBar
         if (actionBar != null && !actionBar.isShowing) {
-            // Show the status bar.
-            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
-                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
+            WindowCompat.setDecorFitsSystemWindows(window, true)
+            WindowInsetsControllerCompat(window, window.decorView).also { controller ->
+                controller.show(WindowInsetsCompat.Type.systemBars())
+            }
 
             // Show the action bar.
             actionBar.show()
@@ -227,9 +220,5 @@ class MainActivity : Activity(),
     override fun onResume() {
         super.onResume()
         start()
-    }
-
-    companion object {
-        private const val REQUEST_SAVE = 0x5473 // "SAVE"
     }
 }

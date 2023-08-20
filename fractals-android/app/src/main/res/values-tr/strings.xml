@@ -5,12 +5,9 @@
     <!-- Notifications. -->
     <string name="finished">Çizim bitti.</string>
 
-    <!-- Saved. -->
-    <string name="menu_save_file">Dosyaya kaydet</string>
-    <string name="saving_text">Resim dosyaya kaydediliyor…</string>
-    <string name="saved_title">Fraktallar kaydedilir.</string>
-    <string name="saved_text">Alanlarınızı görüntülemek için dokunun.</string>
-    <string name="save_failed">Resim kaydedilemedi.</string>
+    <!-- Share. -->
+    <string name="sendImage" msgid="7279510542799399570">"Resmi şunun aracılığıyla paylaş:"</string>
+    <string name="share_failed">Resim kaydedilemedi.</string>
 
     <!-- Menu. -->
     <string name="menu_fullscreen">Tam ekran</string>

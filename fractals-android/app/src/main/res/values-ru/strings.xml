@@ -5,12 +5,9 @@
     <!-- Notifications. -->
     <string name="finished">Рисование закончена.</string>
 
-    <!-- Saved. -->
-    <string name="menu_save_file">Сохранить в файл</string>
-    <string name="saving_text">Сохранение изображения в файл…</string>
-    <string name="saved_title">Фракталы сохраняются.</string>
-    <string name="saved_text">Нажмите для просмотра полей.</string>
-    <string name="save_failed">Не удалось сохранить изображение.</string>
+    <!-- Share. -->
+    <string name="sendImage" msgid="7279510542799399570">"Отправить картинку через"</string>
+    <string name="share_failed">Не удалось сохранить изображение.</string>
 
     <!-- Menu. -->
     <string name="menu_fullscreen">Полноэкранный</string>

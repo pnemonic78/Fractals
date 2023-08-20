@@ -5,12 +5,9 @@
     <!-- Notifications. -->
     <string name="finished">Ritningen är färdig.</string>
 
-    <!-- Saved. -->
-    <string name="menu_save_file">Spara till fil</string>
-    <string name="saving_text">Spara bilden till fil…</string>
-    <string name="saved_title">Fraktaler sparas.</string>
-    <string name="saved_text">Tryck här för att visa dina fält.</string>
-    <string name="save_failed">Det gick inte att spara bilden.</string>
+    <!-- Share. -->
+    <string name="sendImage" msgid="7279510542799399570">"Dela bild via"</string>
+    <string name="share_failed">Det gick inte att spara bilden.</string>
 
     <!-- Menu. -->
     <string name="menu_fullscreen">Fullskärm</string>

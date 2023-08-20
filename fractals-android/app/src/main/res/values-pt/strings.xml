@@ -5,12 +5,9 @@
     <!-- Notifications. -->
     <string name="finished">O desenho está concluído.</string>
 
-    <!-- Saved. -->
-    <string name="menu_save_file">Salvar em arquivo</string>
-    <string name="saving_text">Salvando imagem para arquivo…</string>
-    <string name="saved_title">Fractals são salvos.</string>
-    <string name="saved_text">Toque para visualizar os campos.</string>
-    <string name="save_failed">Falha ao salvar a imagem.</string>
+    <!-- Share. -->
+    <string name="sendImage" msgid="7279510542799399570">"Compartilhar imagem via"</string>
+    <string name="share_failed">Falha ao salvar a imagem.</string>
 
     <!-- Menu. -->
     <string name="menu_fullscreen">Tela cheia</string>

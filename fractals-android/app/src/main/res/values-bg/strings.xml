@@ -5,12 +5,9 @@
     <!-- Notifications. -->
     <string name="finished">Визуализация е завършен.</string>
 
-    <!-- Saved. -->
-    <string name="menu_save_file">Запазване на файл</string>
-    <string name="saving_text">Запазване на изображението във файл…</string>
-    <string name="saved_title">Фракталите са запазени.</string>
-    <string name="saved_text">Докоснете, за да видите полета си.</string>
-    <string name="save_failed">Неуспешно запазване на изображението.</string>
+    <!-- Share. -->
+    <string name="sendImage" msgid="7279510542799399570">"Споделяне на снимки чрез"</string>
+    <string name="share_failed">Неуспешно запазване на изображението.</string>
 
     <!-- Menu. -->
     <string name="menu_fullscreen">Цял екран</string>

@@ -5,12 +5,9 @@
     <!-- Notifications. -->
     <string name="finished">העיבוד סיים.</string>
 
-    <!-- Saved. -->
-    <string name="menu_save_file">שמור לקובץ</string>
-    <string name="saving_text">שמירת תמונה לקובץ…</string>
-    <string name="saved_title">פרקטלים נשמרות.</string>
-    <string name="saved_text">גע כדי להציג שדות שלך.</string>
-    <string name="save_failed">שמירת תמונה נכשלה.</string>
+    <!-- Share. -->
+    <string name="sendImage" msgid="7279510542799399570">"שתף תמונה באמצעות"</string>
+    <string name="share_failed">שמירת תמונה נכשלה.</string>
 
     <!-- Menu. -->
     <string name="menu_fullscreen">מסך מלא</string>

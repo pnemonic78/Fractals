@@ -1,22 +1,20 @@
 plugins {
     id("com.android.application")
-    id("kotlin-android")
+    kotlin("android")
 }
 
 val versionMajor = (project.property("APP_VERSION_MAJOR") as String).toInt()
 val versionMinor = (project.property("APP_VERSION_MINOR") as String).toInt()
 
 android {
-    compileSdkVersion(Versions.androidBuildSdkVersion)
+    compileSdk = Versions.androidBuildSdkVersion
 
     defaultConfig {
         applicationId = "com.github.fractals"
-        minSdkVersion(Versions.androidBuildMinSdkVersion)
-        targetSdkVersion(Versions.androidBuildTargetSdkVersion)
+        minSdk = Versions.androidBuildMinSdkVersion
+        targetSdk = Versions.androidBuildTargetSdkVersion
         versionCode = generateVersionCode(versionMajor, versionMinor)
         versionName = "${versionMajor}.${versionMinor.toString().padLeft(2, "0")}"
-
-        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
@@ -54,7 +52,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
     lintOptions {
@@ -66,18 +64,13 @@ android {
 }
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-
-    // Kotlin
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlinVersion}")
-
     // Rx
-    implementation("io.reactivex.rxjava3:rxandroid:3.0.0")
+    implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
 
     // AndroidX
-    implementation("androidx.core:core-ktx:1.3.2")
-    implementation("androidx.preference:preference-ktx:1.1.1")
+    implementation("androidx.core:core-ktx:1.10.1")
+    implementation("androidx.preference:preference-ktx:1.2.1")
 
     // Testing
-    testImplementation("junit:junit:4.13")
+    testImplementation("junit:junit:4.13.2")
 }

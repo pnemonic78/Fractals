@@ -5,12 +5,9 @@
     <!-- Notifications. -->
     <string name="finished">ड्राइंग समाप्त हो गया है।</string>
 
-    <!-- Saved. -->
-    <string name="menu_save_file">फाइल को बचाएं</string>
-    <string name="saving_text">दाखिल करने के लिए सेविंग छवि…</string>
-    <string name="saved_title">भग्न से बच रहे हैं।</string>
-    <string name="saved_text">अपने खेतों देखने के लिए स्पर्श करें।</string>
-    <string name="save_failed">छवि को बचाने में विफल।</string>
+    <!-- Share. -->
+    <string name="sendImage" msgid="7279510542799399570">"इसके द्वारा चित्र शेयर करें"</string>
+    <string name="share_failed">छवि को बचाने में विफल।</string>
 
     <!-- Menu. -->
     <string name="menu_fullscreen">पूर्ण स्क्रीन</string>
