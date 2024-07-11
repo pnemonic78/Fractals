@@ -110,7 +110,7 @@ class FractalsWallpaperService : WallpaperService() {
             // Zoom not relevant to wallpaper.
         }
 
-        override fun onRenderFieldStarted(view: Fractals) {}
+        override fun onRenderFieldStarted(view: Fractals) = Unit
 
         override fun onRenderFieldFinished(view: Fractals) {
             if (view === mainView) {
@@ -118,7 +118,7 @@ class FractalsWallpaperService : WallpaperService() {
             }
         }
 
-        override fun onRenderFieldCancelled(view: Fractals) {}
+        override fun onRenderFieldCancelled(view: Fractals) = Unit
 
         override fun onDraw(view: WallpaperView) {
             if (view === mainView) {

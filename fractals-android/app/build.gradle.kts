@@ -3,18 +3,19 @@ plugins {
     kotlin("android")
 }
 
-val versionMajor = (project.property("APP_VERSION_MAJOR") as String).toInt()
-val versionMinor = (project.property("APP_VERSION_MINOR") as String).toInt()
+val versionMajor = project.property("APP_VERSION_MAJOR").toString().toInt()
+val versionMinor = project.property("APP_VERSION_MINOR").toString().toInt()
 
 android {
-    compileSdk = Versions.androidBuildSdkVersion
+    compileSdk = Versions.androidBuildSdk
+    namespace = "com.github.fractals"
 
     defaultConfig {
         applicationId = "com.github.fractals"
-        minSdk = Versions.androidBuildMinSdkVersion
-        targetSdk = Versions.androidBuildTargetSdkVersion
+        minSdk = Versions.androidBuildMinSdk
+        targetSdk = Versions.androidBuildTargetSdk
         versionCode = generateVersionCode(versionMajor, versionMinor)
-        versionName = "${versionMajor}.${versionMinor.toString().padLeft(2, "0")}"
+        versionName = "${versionMajor}.${versionMinor.toString().padStart(2, '0')}"
     }
 
     signingConfigs {
@@ -35,41 +36,36 @@ android {
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            proguardFile(getDefaultProguardFile("proguard-android.txt"))
+            proguardFile("proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
         }
     }
 
-    sourceSets {
-        getByName("main") {
-            java.srcDir("src/main/kotlin")
-        }
-    }
-
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = Versions.jvm
+        targetCompatibility = Versions.jvm
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        jvmTarget = Versions.jvm.toString()
     }
 
-    lintOptions {
-        disable("AllowBackup")
-        disable("AlwaysShowAction")
-        disable("ClickableViewAccessibility")
-        disable("GoogleAppIndexingWarning")
+    lint {
+        disable += "AllowBackup"
+        disable += "AlwaysShowAction"
+        disable += "ClickableViewAccessibility"
+        disable += "GoogleAppIndexingWarning"
     }
 }
 
 dependencies {
-    // Rx
-    implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
-
-    // AndroidX
-    implementation("androidx.core:core-ktx:1.10.1")
+    // Jetpack
+    implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.preference:preference-ktx:1.2.1")
+
+    // TODO migrate Rx to Flow
+    implementation("io.reactivex.rxjava3:rxandroid:3.0.2")
 
     // Testing
     testImplementation("junit:junit:4.13.2")

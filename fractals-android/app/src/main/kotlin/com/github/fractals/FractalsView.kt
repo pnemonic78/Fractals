@@ -23,7 +23,11 @@ import android.graphics.Point
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
-import android.view.*
+import android.view.GestureDetector
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
+import android.view.View
+import android.view.WindowManager
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -42,8 +46,7 @@ class FractalsView : View,
 
     private val size: Point by lazy {
         val sizeValue = Point()
-        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val display = windowManager.defaultDisplay
+        val display = this.display
         // include navigation bar
         display.getRealSize(sizeValue)
         sizeValue
@@ -85,7 +88,11 @@ class FractalsView : View,
         init(context)
     }
 
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         init(context)
     }
 
@@ -198,11 +205,16 @@ class FractalsView : View,
         return false
     }
 
-    override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+    override fun onFling(
+        e1: MotionEvent?,
+        e2: MotionEvent,
+        velocityX: Float,
+        velocityY: Float
+    ): Boolean {
         return false
     }
 
-    override fun onLongPress(e: MotionEvent) {}
+    override fun onLongPress(e: MotionEvent) = Unit
 
     override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
         if (scrolling) {
@@ -232,7 +244,12 @@ class FractalsView : View,
         scaling = false
     }
 
-    override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+    override fun onScroll(
+        e1: MotionEvent?,
+        e2: MotionEvent,
+        distanceX: Float,
+        distanceY: Float
+    ): Boolean {
         if (scaling) {
             return false
         }
