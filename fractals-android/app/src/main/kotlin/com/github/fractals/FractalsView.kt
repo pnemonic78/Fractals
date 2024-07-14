@@ -46,7 +46,7 @@ class FractalsView : View,
 
     private val size: Point by lazy {
         val sizeValue = Point()
-        val display = this.display
+        val display = findDisplay()
         // include navigation bar
         display.getRealSize(sizeValue)
         sizeValue
