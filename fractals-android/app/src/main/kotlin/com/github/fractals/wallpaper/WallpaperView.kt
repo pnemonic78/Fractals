@@ -21,20 +21,30 @@ import android.graphics.Canvas
 import android.graphics.Matrix
 import android.view.GestureDetector
 import android.view.MotionEvent
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
+import androidx.lifecycle.LifecycleCoroutineScope
+import com.github.fractals.FractalImage
 import com.github.fractals.FractalTask
 import com.github.fractals.Fractals
-import io.reactivex.rxjava3.core.Observer
-import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 
 /**
  * Live wallpaper view.
  *
  * @author Moshe Waisberg
  */
-class WallpaperView(context: Context, listener: WallpaperListener) :
-    Fractals,
-    Observer<Bitmap>,
+class WallpaperView(
+    context: Context,
+    private val lifecycleScope: LifecycleCoroutineScope,
+    listener: WallpaperListener
+) : Fractals,
     GestureDetector.OnGestureListener,
     GestureDetector.OnDoubleTapListener {
 
@@ -43,10 +53,9 @@ class WallpaperView(context: Context, listener: WallpaperListener) :
     var height: Int = 0
         private set
     private var bitmap: Bitmap? = null
-    private var task: FractalTask? = null
+    private var task: Job? = null
     private var listener: WallpaperListener? = null
     private val gestureDetector: GestureDetector = GestureDetector(context, this)
-    private var isIdle = false
 
     /**
      * The matrix for the bitmap.
@@ -57,27 +66,36 @@ class WallpaperView(context: Context, listener: WallpaperListener) :
         setWallpaperListener(listener)
     }
 
+    fun isIdle(): Boolean {
+        val job = task ?: return true
+        return job.isCancelled || job.isCompleted || !job.isActive
+    }
+
     override fun clear() {
         bitmapMatrix.reset()
     }
 
     override fun start(delay: Long) {
-        if (isIdle) {
-            val observer = this
-            FractalTask(bitmapMatrix, bitmap!!).apply {
-                task = this
-                saturation = 0.5f
-                brightness = 0.5f
-                startDelay = delay
-                subscribeOn(Schedulers.computation())
-                    .subscribe(observer)
+        if (isIdle()) {
+            task = lifecycleScope.launch(Dispatchers.Default) {
+                FractalTask(bitmap!!, bitmapMatrix).apply {
+                    saturation = 0.5f
+                    brightness = 0.5f
+                    startDelay = delay
+                }
+                    .flowOn(Dispatchers.Default)
+                    .onStart { onTaskStart() }
+                    .onCompletion { onTaskComplete() }
+                    .catch { onTaskError(it) }
+                    .collect { onTaskNext(it) }
             }
         }
     }
 
     override fun stop() {
-        task?.cancel()
-        isIdle = true
+        lifecycleScope.launch {
+            task?.cancel()
+        }
     }
 
     fun onTouchEvent(event: MotionEvent) {
@@ -126,22 +144,20 @@ class WallpaperView(context: Context, listener: WallpaperListener) :
         return false
     }
 
-    override fun onNext(value: Bitmap) {
+    private fun onTaskNext(value: FractalImage) {
+        this.bitmap = value.bitmap
         invalidate()
     }
 
-    override fun onError(e: Throwable) {
-        isIdle = true
+    private fun onTaskError(e: Throwable) {
         listener?.onRenderFieldCancelled(this)
     }
 
-    override fun onComplete() {
-        isIdle = true
+    private fun onTaskComplete() {
         listener?.onRenderFieldFinished(this)
     }
 
-    override fun onSubscribe(d: Disposable) {
-        isIdle = false
+    private fun onTaskStart() {
         listener?.onRenderFieldStarted(this)
     }
 
@@ -154,7 +170,7 @@ class WallpaperView(context: Context, listener: WallpaperListener) :
         this.listener = listener
     }
 
-    protected fun invalidate() {
+    private fun invalidate() {
         listener?.onDraw(this)
     }
 
@@ -177,11 +193,11 @@ class WallpaperView(context: Context, listener: WallpaperListener) :
                 }
                 val rotated = Bitmap.createBitmap(bitmapOld, 0, 0, bw, bh, m, true)
                 if (rotated !== bitmapOld) bitmapOld.recycle()
-                bitmap = Bitmap.createScaledBitmap(rotated, width, height, true)
+                bitmap = rotated.scale(width, height)
                 if (rotated !== bitmap) rotated.recycle()
             }
         } else {
-            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+            bitmap = createBitmap(width, height, Bitmap.Config.RGB_565)
         }
     }
 
@@ -197,4 +213,5 @@ class WallpaperView(context: Context, listener: WallpaperListener) :
         bitmap?.recycle()
         bitmap = null
     }
+
 }

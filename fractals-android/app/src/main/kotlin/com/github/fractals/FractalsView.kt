@@ -27,10 +27,14 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
-import android.view.WindowManager
-import io.reactivex.rxjava3.core.Observer
-import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.schedulers.Schedulers
+import androidx.core.graphics.createBitmap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 
 /**
  * Fractals view.
@@ -39,7 +43,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers
  */
 class FractalsView : View,
     Fractals,
-    Observer<Bitmap>,
     GestureDetector.OnGestureListener,
     GestureDetector.OnDoubleTapListener,
     ScaleGestureDetector.OnScaleGestureListener {
@@ -52,18 +55,9 @@ class FractalsView : View,
         sizeValue
     }
 
-    private var _bitmap: Bitmap? = null
-    val bitmap: Bitmap
-        get() {
-            if (_bitmap == null) {
-                val size = this.size
-                val width = size.x
-                val height = size.y
-                _bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-            }
-            return _bitmap!!
-        }
-    private var task: FractalTask? = null
+    var bitmap: Bitmap? = null
+        private set
+    private var task: Job? = null
     private var listener: FractalsListener? = null
     private lateinit var gestureDetector: GestureDetector
     private lateinit var scaleGestureDetector: ScaleGestureDetector
@@ -103,6 +97,7 @@ class FractalsView : View,
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
+        val bitmap = bitmap ?: return
         measuredWidthDiff = (w - bitmap.width) / 2f
         measuredHeightDiff = (h - bitmap.height) / 2f
     }
@@ -112,23 +107,37 @@ class FractalsView : View,
     }
 
     override fun onDraw(canvas: Canvas) {
+        val bitmap = bitmap ?: return
         canvas.drawBitmap(bitmap, measuredWidthDiff, measuredHeightDiff, null)
     }
 
     override fun start(delay: Long) {
         if (isIdle()) {
-            val observer = this
-            FractalTask(bitmapMatrix, bitmap).apply {
-                task = this
-                startDelay = delay
-                subscribeOn(Schedulers.computation())
-                    .subscribe(observer)
+            task = lifecycleScope.launch(Dispatchers.Default) {
+                var bitmap = bitmap
+                if (bitmap == null) {
+                    val size = this@FractalsView.size
+                    val width = size.x
+                    val height = size.y
+                    bitmap = createBitmap(width, height)
+                }
+
+                FractalTask(bitmap, bitmapMatrix).apply {
+                    startDelay = delay
+                }
+                    .flowOn(Dispatchers.Default)
+                    .onStart { onTaskStart() }
+                    .onCompletion { onTaskComplete() }
+                    .catch { onTaskError(it) }
+                    .collect { onTaskNext(it) }
             }
         }
     }
 
     override fun stop() {
-        task?.cancel()
+        lifecycleScope.launch {
+            task?.cancel()
+        }
     }
 
     /**
@@ -173,7 +182,10 @@ class FractalsView : View,
      * Is the task idle and not rendering the fields?
      * @return `true` if idle.
      */
-    fun isIdle(): Boolean = (task == null) || task!!.isIdle()
+    fun isIdle(): Boolean {
+        val job = task ?: return true
+        return job.isCancelled || job.isCompleted || !job.isActive
+    }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (scrolling || (event.pointerCount <= 1)) {
@@ -285,27 +297,27 @@ class FractalsView : View,
         return false
     }
 
-    override fun onNext(value: Bitmap) {
+    private fun onTaskNext(value: FractalImage) {
+        this.bitmap = value.bitmap
         postInvalidate()
     }
 
-    override fun onError(e: Throwable) {
+    private fun onTaskError(e: Throwable) {
         listener?.onRenderFieldCancelled(this)
     }
 
-    override fun onComplete() {
+    private fun onTaskComplete() {
         listener?.onRenderFieldFinished(this)
-        clear()
     }
 
-    override fun onSubscribe(d: Disposable) {
+    private fun onTaskStart() {
         listener?.onRenderFieldStarted(this)
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        _bitmap?.recycle()
-        _bitmap = null
+        bitmap?.recycle()
+        bitmap = null
     }
 
     class SavedState : BaseSavedState {

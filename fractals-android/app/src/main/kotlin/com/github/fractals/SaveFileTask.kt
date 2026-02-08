@@ -15,19 +15,15 @@
  */
 package com.github.fractals
 
-import android.annotation.TargetApi
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build
 import android.os.Environment.DIRECTORY_PICTURES
 import android.provider.MediaStore
 import android.util.Log
-import com.github.reactivex.DefaultDisposable
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Observer
-import io.reactivex.rxjava3.disposables.Disposable
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -38,48 +34,38 @@ import java.util.Locale
  *
  * @author Moshe Waisberg
  */
-class SaveFileTask(private val context: Context, private val bitmap: Bitmap) : Observable<Uri>(),
-    Disposable {
+class SaveFileTask(private val context: Context, private val bitmap: Bitmap) : Flow<Uri> {
 
-    private lateinit var runner: SaveFileRunner
-
-    override fun subscribeActual(observer: Observer<in Uri>) {
-        val d = SaveFileRunner(context, bitmap, observer)
-        runner = d
-        observer.onSubscribe(d)
-        d.run()
-    }
-
-    override fun isDisposed(): Boolean {
-        return runner.isDisposed
-    }
-
-    override fun dispose() {
-        runner.dispose()
+    override suspend fun collect(collector: FlowCollector<Uri>) {
+        val runner = SaveFileRunner(context, bitmap, collector)
+        runner.run()
     }
 
     private class SaveFileRunner(
         val context: Context,
         val bitmap: Bitmap,
-        val observer: Observer<in Uri>
-    ) : DefaultDisposable() {
-
-        fun run() {
-            saveContent(context, bitmap, observer)
+        val collector: FlowCollector<Uri>
+    ) {
+        suspend fun run() {
+            saveContent(context, bitmap, collector)
         }
 
-        @TargetApi(Build.VERSION_CODES.Q)
-        private fun saveContent(context: Context, bitmap: Bitmap, observer: Observer<in Uri>) {
+        private suspend fun saveContent(
+            context: Context,
+            bitmap: Bitmap,
+            collector: FlowCollector<Uri>
+        ) {
             val path =
                 DIRECTORY_PICTURES + File.separator + context.getString(R.string.app_folder_pictures)
 
-            val values = ContentValues()
-            values.put(MediaStore.Images.Media.DISPLAY_NAME, generateFileName())
-            values.put(MediaStore.Images.Media.MIME_TYPE, IMAGE_MIME)
-            values.put(MediaStore.Images.Media.RELATIVE_PATH, path)
-            values.put(MediaStore.MediaColumns.WIDTH, bitmap.width)
-            values.put(MediaStore.MediaColumns.HEIGHT, bitmap.height)
-            values.put(MediaStore.MediaColumns.IS_PENDING, 1)
+            val values = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, generateFileName())
+                put(MediaStore.Images.Media.MIME_TYPE, IMAGE_MIME)
+                put(MediaStore.Images.Media.RELATIVE_PATH, path)
+                put(MediaStore.MediaColumns.WIDTH, bitmap.width)
+                put(MediaStore.MediaColumns.HEIGHT, bitmap.height)
+                put(MediaStore.MediaColumns.IS_PENDING, 1)
+            }
 
             val cr = context.contentResolver
             var uri: Uri? = null
@@ -97,19 +83,12 @@ class SaveFileTask(private val context: Context, private val bitmap: Bitmap) : O
                     cr.update(uri, values, null, null)
                     Log.i(TAG, "save success: $bitmap $uri")
 
-                    if (!isDisposed) {
-                        observer.onNext(uri)
-                        observer.onComplete()
-                    }
+                    collector.emit(uri)
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "save failed: $uri", e)
-                observer.onError(e)
-                return
+                throw e
             }
-        }
-
-        override fun onDispose() {
         }
 
         fun generateFileName(): String {

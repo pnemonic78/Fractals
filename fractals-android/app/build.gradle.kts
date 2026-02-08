@@ -68,12 +68,9 @@ android {
 }
 
 dependencies {
-    // Jetpack
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.service)
     implementation(libs.androidx.preference.ktx)
-
-    // TODO migrate Rx to Flow
-    implementation(libs.rxandroid)
 
     // Testing
     testImplementation(libs.junit)

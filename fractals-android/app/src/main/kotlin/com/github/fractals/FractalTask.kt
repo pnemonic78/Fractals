@@ -15,20 +15,31 @@
  */
 package com.github.fractals
 
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Matrix
+import android.graphics.Paint
 import android.os.SystemClock
 import android.util.Log
-import com.github.reactivex.DefaultDisposable
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Observer
-import io.reactivex.rxjava3.disposables.Disposable
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
 import java.lang.Thread.sleep
+import kotlin.math.ln
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Fractals task.
  * @author Moshe Waisberg
  */
-class FractalTask(private val matrix: Matrix, private val bitmap: Bitmap, private val hues: Double = DEFAULT_HUES) : Observable<Bitmap>(), Disposable {
+class FractalTask(
+    private val bitmap: Bitmap,
+    private val matrix: Matrix,
+    private val hues: Double = DEFAULT_HUES
+) : Flow<FractalImage> {
 
     private var runner: FractalRunner? = null
     var brightness = 1f
@@ -47,34 +58,22 @@ class FractalTask(private val matrix: Matrix, private val bitmap: Bitmap, privat
             runner?.let { it.startDelay = value }
         }
 
-    override fun subscribeActual(observer: Observer<in Bitmap>) {
-        val d = FractalRunner(matrix, bitmap, hues, observer)
-        d.brightness = brightness
-        d.saturation = saturation
-        d.startDelay = startDelay
-        runner = d
-        observer.onSubscribe(d)
-        d.run()
+    override suspend fun collect(collector: FlowCollector<FractalImage>) {
+        runner = FractalRunner(matrix, bitmap, hues, collector).apply {
+            this@FractalTask.brightness = brightness
+            this@FractalTask.saturation = saturation
+            this@FractalTask.startDelay = startDelay
+            run()
+        }
     }
 
-    override fun isDisposed(): Boolean {
-        return runner?.isDisposed ?: false
-    }
-
-    override fun dispose() {
-        runner?.dispose()
-    }
-
-    fun isIdle(): Boolean = (runner == null) || !runner!!.running || isDisposed
-
-    fun cancel() {
-        dispose()
-    }
-
-    private class FractalRunner(val matrix: Matrix, val bitmap: Bitmap, val hues: Double, val observer: Observer<in Bitmap>) : DefaultDisposable() {
-
+    private class FractalRunner(
+        val matrix: Matrix,
+        val bitmap: Bitmap,
+        val hues: Double,
+        val collector: FlowCollector<FractalImage>
+    ) {
         private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-        private val rect = RectF()
         private val hsv = floatArrayOf(0f, 1f, 1f)
         var startDelay = 0L
         var running = false
@@ -103,18 +102,15 @@ class FractalTask(private val matrix: Matrix, private val bitmap: Bitmap, privat
             }
         }
 
-        fun run() {
+        suspend fun run() {
             running = true
             if (startDelay > 0L) {
                 try {
                     sleep(startDelay)
-                } catch (ignore: InterruptedException) {
+                } catch (_: InterruptedException) {
                 }
             }
-            if (isDisposed) {
-                return
-            }
-            observer.onNext(bitmap)
+            collector.emit(FractalImage(bitmap, Int.MAX_VALUE))
 
             val timeStart = SystemClock.elapsedRealtime()
             val matrixValues = FloatArray(9)
@@ -125,14 +121,14 @@ class FractalTask(private val matrix: Matrix, private val bitmap: Bitmap, privat
 
             val w = bitmap.width
             val h = bitmap.height
-            var sizeMax = Math.max(w, h)
-            val sizeMin = Math.min(w, h)
+            var sizeMax = max(w, h)
+            val sizeMin = min(w, h)
             val sizeRe = if (h >= w) sizeMin.toDouble() else sizeMin * RE_SIZE / IM_SIZE
             val sizeIm = if (h >= w) sizeMin * IM_SIZE / RE_SIZE else sizeMin.toDouble()
             val sizeSetRe = sizeRe * zoom / RE_SIZE
             val sizeSetIm = sizeIm * zoom / IM_SIZE
-            val offsetRe = scrollX + Math.min(0.0, (sizeRe - w) / 2.0)
-            val offsetIm = scrollY + Math.min(0.0, (sizeIm - h) / 2.0)
+            val offsetRe = scrollX + min(0.0, (sizeRe - w) / 2.0)
+            val offsetIm = scrollY + min(0.0, (sizeIm - h) / 2.0)
 
             var shifts = 0
             while (sizeMax > 1) {
@@ -144,6 +140,7 @@ class FractalTask(private val matrix: Matrix, private val bitmap: Bitmap, privat
             // Make "resolution2" a power of 2, so that "resolution" is always divisible by 2.
             var resolution2 = 1 shl shifts
             var resolution = resolution2
+            var resF = resolution.toFloat()
 
             val canvas = Canvas(bitmap)
             canvas.drawColor(Color.WHITE)
@@ -155,44 +152,44 @@ class FractalTask(private val matrix: Matrix, private val bitmap: Bitmap, privat
             val x0Re = offsetRe / sizeSetRe + RE_MIN / zoom
             val y0Im = offsetIm / sizeSetIm + IM_MIN / zoom
 
-            plotMandelbrot(canvas, 0, 0, resolution, resolution, x0Re, y0Im, density)
+            plotMandelbrot(canvas, 0f, 0f, resF, resF, x0Re, y0Im, density)
 
-            var x1: Int
-            var y1: Int
-            var x2: Int
-            var y2: Int
+            var x1: Float
+            var y1: Float
+            var x2: Float
+            var y2: Float
             var x1Re: Double
             var y1Im: Double
             var x2Re: Double
             var y2Im: Double
 
             loop@ do {
-                y1 = 0
-                y2 = resolution
+                y1 = 0f
+                y2 = resF
                 y1Im = y0Im
                 y2Im = y1Im + dyIm
 
                 do {
-                    x1 = 0
-                    x2 = resolution
+                    x1 = 0f
+                    x2 = resF
                     x1Re = x0Re
                     x2Re = x1Re + dxRe
 
                     do {
-                        plotMandelbrot(canvas, x1, y2, resolution, resolution, x1Re, y2Im, density)
-                        plotMandelbrot(canvas, x2, y1, resolution, resolution, x2Re, y1Im, density)
-                        plotMandelbrot(canvas, x2, y2, resolution, resolution, x2Re, y2Im, density)
+                        plotMandelbrot(canvas, x1, y2, resF, resF, x1Re, y2Im, density)
+                        plotMandelbrot(canvas, x2, y1, resF, resF, x2Re, y1Im, density)
+                        plotMandelbrot(canvas, x2, y2, resF, resF, x2Re, y2Im, density)
 
                         x1 += resolution2
                         x2 += resolution2
                         x1Re += dxRe2
                         x2Re += dxRe2
-                    } while ((x1 < w) && !isDisposed)
+                    } while ((x1 < w) && !isDisposed())
 
-                    if (isDisposed) {
+                    if (isDisposed()) {
                         break@loop
                     }
-                    observer.onNext(bitmap)
+                    collector.emit(FractalImage(bitmap, resolution))
 
                     y1 += resolution2
                     y2 += resolution2
@@ -202,16 +199,16 @@ class FractalTask(private val matrix: Matrix, private val bitmap: Bitmap, privat
 
                 resolution2 = resolution
                 resolution = resolution2 shr 1
+                resF = resolution.toFloat()
                 dxRe = resolution / sizeSetRe
                 dyIm = resolution / sizeSetIm
                 dxRe2 = resolution2 / sizeSetRe
                 dyIm2 = resolution2 / sizeSetIm
-            } while ((resolution >= 1) && !isDisposed)
+            } while ((resolution >= 1) && !isDisposed())
 
             running = false
-            if (!isDisposed) {
-                observer.onNext(bitmap)
-                observer.onComplete()
+            if (!isDisposed()) {
+                collector.emit(FractalImage(bitmap, resolution))
             }
 
             val timeEnd = SystemClock.elapsedRealtime()
@@ -225,7 +222,16 @@ class FractalTask(private val matrix: Matrix, private val bitmap: Bitmap, privat
          * <br/>
          * http://en.wikipedia.org/wiki/Mandelbrot_set
          */
-        private fun plotMandelbrot(canvas: Canvas, x: Int, y: Int, w: Int, h: Int, kRe: Double, kIm: Double, density: Double) {
+        private fun plotMandelbrot(
+            canvas: Canvas,
+            x1: Float,
+            y1: Float,
+            w: Float,
+            h: Float,
+            kRe: Double,
+            kIm: Double,
+            density: Double
+        ) {
             var zRe = 0.0
             var zIm = 0.0
             var zReSrq = 0.0
@@ -248,14 +254,13 @@ class FractalTask(private val matrix: Matrix, private val bitmap: Bitmap, privat
 
             var z = i.toDouble()
             if (underflow) {
-                z += LOG2_LOG2_2 - Math.log(Math.log(d)) / LOG2
+                z += LOG2_LOG2_2 - ln(ln(d)) / LOG2
             } else {
                 z = 0.0
             }
 
             paint.color = mapColor(z, density)
-            rect.set(x.toFloat(), y.toFloat(), (x + w).toFloat(), (y + h).toFloat())
-            canvas.drawRect(rect, paint)
+            canvas.drawRect(x1, y1, x1 + w, y1 + h, paint)
         }
 
         private fun mapColor(z: Double, density: Double): Int {
@@ -266,7 +271,14 @@ class FractalTask(private val matrix: Matrix, private val bitmap: Bitmap, privat
             return Color.HSVToColor(hsv)
         }
 
-        override fun onDispose() {
+        suspend fun isDisposed(): Boolean {
+            val job = currentCoroutineContext()[Job] ?: return true
+            return job.isCancelled || job.isCompleted || !job.isActive
+        }
+
+        suspend fun dispose() {
+            val job = currentCoroutineContext()[Job] ?: return
+            job.cancel()
         }
 
         companion object {
@@ -279,8 +291,8 @@ class FractalTask(private val matrix: Matrix, private val bitmap: Bitmap, privat
             private const val IM_MAX = -IM_MIN
             private const val IM_SIZE = IM_MAX - IM_MIN
 
-            private val LOG2 = Math.log(2.0)
-            private val LOG2_LOG2 = Math.log(LOG2) / LOG2
+            private val LOG2 = ln(2.0)
+            private val LOG2_LOG2 = ln(LOG2) / LOG2
             private val LOG2_LOG2_2 = 2.0 + LOG2_LOG2
             private const val OVERFLOW = 300
         }

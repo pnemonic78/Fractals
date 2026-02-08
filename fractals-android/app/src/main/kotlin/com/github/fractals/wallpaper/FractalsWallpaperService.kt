@@ -20,6 +20,10 @@ import android.service.wallpaper.WallpaperService
 import android.text.format.DateUtils
 import android.view.MotionEvent
 import android.view.SurfaceHolder
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ServiceLifecycleDispatcher
+import androidx.lifecycle.lifecycleScope
 import com.github.fractals.Fractals
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.max
@@ -30,9 +34,19 @@ import kotlin.random.Random
  *
  * @author Moshe Waisberg
  */
-class FractalsWallpaperService : WallpaperService() {
+class FractalsWallpaperService : WallpaperService(), LifecycleOwner {
 
-    override fun onCreateEngine(): WallpaperService.Engine {
+    private val dispatcher = ServiceLifecycleDispatcher(this)
+
+    override fun onCreate() {
+        dispatcher.onServicePreSuperOnCreate()
+        super.onCreate()
+    }
+
+    override val lifecycle: Lifecycle
+        get() = dispatcher.lifecycle
+
+    override fun onCreateEngine(): Engine {
         return FractalsWallpaperEngine()
     }
 
@@ -40,7 +54,7 @@ class FractalsWallpaperService : WallpaperService() {
      * Fractals wallpaper engine.
      * @author Moshe Waisberg
      */
-    private inner class FractalsWallpaperEngine : WallpaperService.Engine(), WallpaperListener {
+    private inner class FractalsWallpaperEngine : Engine(), WallpaperListener {
 
         private lateinit var mainView: WallpaperView
         private val random = Random.Default
@@ -51,7 +65,7 @@ class FractalsWallpaperService : WallpaperService() {
             setTouchEventsEnabled(true)
 
             val context: Context = this@FractalsWallpaperService
-            mainView = WallpaperView(context, this)
+            mainView = WallpaperView(context, lifecycleScope, this)
         }
 
         override fun onDestroy() {

@@ -15,32 +15,32 @@
  */
 package com.github.fractals
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.github.reactivex.addTo
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.schedulers.Schedulers
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 
 /**
  * Main activity.
  *
  * @author Moshe Waisberg
  */
-class MainActivity : Activity(),
-    FractalsListener {
+class MainActivity : ComponentActivity(), FractalsListener {
 
     private lateinit var mainView: FractalsView
-    private val disposables = CompositeDisposable()
     private var menuStop: MenuItem? = null
     private var menuShare: MenuItem? = null
 
@@ -54,7 +54,6 @@ class MainActivity : Activity(),
     override fun onDestroy() {
         super.onDestroy()
         mainView.stop()
-        disposables.clear()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -90,7 +89,8 @@ class MainActivity : Activity(),
             }
 
             R.id.menu_share -> {
-                share(bitmap = mainView.bitmap)
+                val bitmap = mainView.bitmap ?: return false
+                share(bitmap = bitmap)
                 return true
             }
         }
@@ -110,22 +110,13 @@ class MainActivity : Activity(),
         menuItem.isEnabled = false
 
         val context: Context = this
-        SaveFileTask(context, bitmap)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ uri ->
-                Intent(Intent.ACTION_SEND).apply {
-                    putExtra(Intent.EXTRA_STREAM, uri)
-                    type = SaveFileTask.IMAGE_MIME
-                    startActivity(Intent.createChooser(this, getString(R.string.share_title)));
-                }
-                menuItem.isEnabled = true
-            }, { e ->
-                e.printStackTrace()
-                Toast.makeText(context, R.string.share_failed, Toast.LENGTH_LONG).show()
-                menuItem.isEnabled = true
-            })
-            .addTo(disposables)
+        lifecycleScope.launch {
+            SaveFileTask(context, bitmap)
+                .flowOn(Dispatchers.IO)
+                .catch { e -> onSaveFile(context, e, menuItem) }
+                .flowOn(Dispatchers.Main)
+                .collect { uri -> onSaveFile(uri, menuItem) }
+        }
     }
 
     override fun onRenderFieldPan(view: Fractals, dx: Int, dy: Int) = Unit
@@ -220,5 +211,20 @@ class MainActivity : Activity(),
     override fun onResume() {
         super.onResume()
         start()
+    }
+
+    private fun onSaveFile(uri: Uri, menuItem: MenuItem) {
+        Intent(Intent.ACTION_SEND).apply {
+            putExtra(Intent.EXTRA_STREAM, uri)
+            type = SaveFileTask.IMAGE_MIME
+            startActivity(Intent.createChooser(this, getString(R.string.share_title)));
+        }
+        menuItem.isEnabled = true
+    }
+
+    private fun onSaveFile(context: Context, error: Throwable, menuItem: MenuItem) {
+        error.printStackTrace()
+        Toast.makeText(context, R.string.share_failed, Toast.LENGTH_LONG).show()
+        menuItem.isEnabled = true
     }
 }

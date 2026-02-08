@@ -6,6 +6,9 @@ import android.view.Display
 import android.view.View
 import android.view.ViewParent
 import android.view.WindowManager
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CoroutineScope
 
 fun View.findDisplay(): Display {
     var display = this.display
@@ -28,3 +31,6 @@ fun View.findDisplay(): Display {
     @Suppress("DEPRECATION")
     return windowManager.defaultDisplay
 }
+
+val View.lifecycleScope: CoroutineScope
+    get() = findViewTreeLifecycleOwner()!!.lifecycleScope
