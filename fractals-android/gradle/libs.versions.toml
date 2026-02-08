@@ -1,0 +1,20 @@
+[versions]
+agp = "9.0.0"
+compileSdk = "36"
+coreKtx = "1.17.0"
+junit = "4.13.2"
+kotlin = "2.3.10"
+minSdk = "21"
+preferenceKtx = "1.2.1"
+rxandroid = "3.0.2"
+targetSdk = "36"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-preference-ktx = { group = "androidx.preference", name = "preference-ktx", version.ref = "preferenceKtx" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+rxandroid = { group = "io.reactivex.rxjava3", name = "rxandroid", version.ref = "rxandroid" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
