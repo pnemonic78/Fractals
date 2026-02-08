@@ -25,6 +25,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ServiceLifecycleDispatcher
 import androidx.lifecycle.lifecycleScope
 import com.github.fractals.Fractals
+import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.max
 import kotlin.random.Random
@@ -156,7 +157,7 @@ class FractalsWallpaperService : WallpaperService(), LifecycleOwner {
                         }
                     }
                 } catch (e: IllegalArgumentException) {
-                    e.printStackTrace()
+                    Timber.e(e)
                 }
             }
             isDrawing.set(false)

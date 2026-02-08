@@ -21,11 +21,11 @@ import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.os.SystemClock
-import android.util.Log
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
+import timber.log.Timber
 import java.lang.Thread.sleep
 import kotlin.math.ln
 import kotlin.math.max
@@ -212,7 +212,7 @@ class FractalTask(
             }
 
             val timeEnd = SystemClock.elapsedRealtime()
-            Log.v(TAG, "Rendered in " + (timeEnd - timeStart) + "ms")
+            Timber.v("Rendered in %dms", timeEnd - timeStart)
         }
 
         /**
@@ -282,8 +282,6 @@ class FractalTask(
         }
 
         companion object {
-            private const val TAG = "FractalRunner"
-
             private const val RE_MIN = -2.0
             private const val RE_MAX = -RE_MIN
             private const val RE_SIZE = RE_MAX - RE_MIN

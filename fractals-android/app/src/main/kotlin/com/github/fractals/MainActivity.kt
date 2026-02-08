@@ -32,6 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Main activity.
@@ -223,7 +224,7 @@ class MainActivity : ComponentActivity(), FractalsListener {
     }
 
     private fun onSaveFile(context: Context, error: Throwable, menuItem: MenuItem) {
-        error.printStackTrace()
+        Timber.e(error)
         Toast.makeText(context, R.string.share_failed, Toast.LENGTH_LONG).show()
         menuItem.isEnabled = true
     }

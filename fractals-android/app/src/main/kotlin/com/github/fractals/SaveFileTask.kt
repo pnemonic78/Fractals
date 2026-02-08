@@ -21,9 +21,9 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment.DIRECTORY_PICTURES
 import android.provider.MediaStore
-import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
+import timber.log.Timber
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -72,7 +72,7 @@ class SaveFileTask(private val context: Context, private val bitmap: Bitmap) : F
             try {
                 uri = cr.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
                 if (uri == null) {
-                    Log.e(TAG, "save failed: $uri")
+                    Timber.e("save failed: %s", uri)
                     return
                 }
 
@@ -81,12 +81,12 @@ class SaveFileTask(private val context: Context, private val bitmap: Bitmap) : F
 
                     values.put(MediaStore.MediaColumns.IS_PENDING, 0)
                     cr.update(uri, values, null, null)
-                    Log.i(TAG, "save success: $bitmap $uri")
+                    Timber.i("save success: %s %s", bitmap, uri)
 
                     collector.emit(uri)
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "save failed: $uri", e)
+                Timber.e(e, "save failed: %s", uri)
                 throw e
             }
         }
@@ -96,8 +96,6 @@ class SaveFileTask(private val context: Context, private val bitmap: Bitmap) : F
         }
 
         companion object {
-            private const val TAG = "SaveFileTask"
-
             private val timestampFormat = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US)
         }
     }
