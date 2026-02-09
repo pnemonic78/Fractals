@@ -14,6 +14,7 @@
 
     <!-- Menu. -->
     <string name="menu_fullscreen">Fullscreen</string>
+    <string name="menu_mode">Mode</string>
     <string name="menu_stop" translatable="false">@android:string/cancel</string>
 
     <!-- Live wallpaper. -->

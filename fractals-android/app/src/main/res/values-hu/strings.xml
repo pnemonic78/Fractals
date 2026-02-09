@@ -11,4 +11,5 @@
 
     <!-- Menu. -->
     <string name="menu_fullscreen">Teljes képernyő</string>
+    <string name="menu_mode">Mód</string>
 </resources>

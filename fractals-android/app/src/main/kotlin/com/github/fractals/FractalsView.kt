@@ -66,6 +66,8 @@ class FractalsView : View,
     private var zoomViewing = 1f
     private var scrolling: Boolean = false
     private var scaling: Boolean = false
+    private var paramCReal: Double? = null
+    private var paramCImaginary: Double? = null
 
     /**
      * The matrix for the bitmap.
@@ -122,7 +124,7 @@ class FractalsView : View,
                     bitmap = createBitmap(width, height)
                 }
 
-                FractalTask(bitmap, bitmapMatrix).apply {
+                FractalTask(bitmap, bitmapMatrix, paramCReal, paramCImaginary).apply {
                     startDelay = delay
                 }
                     .flowOn(Dispatchers.Default)
@@ -318,6 +320,19 @@ class FractalsView : View,
         super.onDetachedFromWindow()
         bitmap?.recycle()
         bitmap = null
+    }
+
+    fun setJulia(cRe: Double? = null, cIm: Double? = null) {
+        paramCReal = cRe
+        paramCImaginary = cIm
+    }
+
+    fun setJuliaReal(cRe: Double) {
+        paramCReal = cRe
+    }
+
+    fun setJuliaImaginary(cIm: Double) {
+        paramCImaginary = cIm
     }
 
     class SavedState : BaseSavedState {

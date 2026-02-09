@@ -11,4 +11,5 @@
 
     <!-- Menu. -->
     <string name="menu_fullscreen">تكبير الشاشة</string>
+    <string name="menu_mode">وضع</string>
 </resources>

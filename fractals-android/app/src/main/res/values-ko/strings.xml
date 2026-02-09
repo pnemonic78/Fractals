@@ -11,4 +11,5 @@
 
     <!-- Menu. -->
     <string name="menu_fullscreen">전체 화면</string>
+    <string name="menu_mode">모드</string>
 </resources>

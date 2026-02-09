@@ -11,4 +11,5 @@
 
     <!-- Menu. -->
     <string name="menu_fullscreen">Koko näyttö</string>
+    <string name="menu_mode">Tila</string>
 </resources>

@@ -38,6 +38,8 @@ import kotlin.math.min
 class FractalTask(
     private val bitmap: Bitmap,
     private val matrix: Matrix,
+    private val cRe: Double? = null,
+    private val cIm: Double? = null,
     private val hues: Double = DEFAULT_HUES
 ) : Flow<FractalImage> {
 
@@ -59,7 +61,7 @@ class FractalTask(
         }
 
     override suspend fun collect(collector: FlowCollector<FractalImage>) {
-        runner = FractalRunner(matrix, bitmap, hues, collector).apply {
+        runner = FractalRunner(matrix, bitmap, cRe, cIm, hues, collector).apply {
             this@FractalTask.brightness = brightness
             this@FractalTask.saturation = saturation
             this@FractalTask.startDelay = startDelay
@@ -68,10 +70,12 @@ class FractalTask(
     }
 
     private class FractalRunner(
-        val matrix: Matrix,
-        val bitmap: Bitmap,
-        val hues: Double,
-        val collector: FlowCollector<FractalImage>
+        private val matrix: Matrix,
+        private val bitmap: Bitmap,
+        private val cRe: Double? = null,
+        private val cIm: Double? = null,
+        private val hues: Double,
+        private val collector: FlowCollector<FractalImage>
     ) {
         private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
         private val hsv = floatArrayOf(0f, 1f, 1f)
@@ -143,7 +147,6 @@ class FractalTask(
             var resF = resolution.toFloat()
 
             val canvas = Canvas(bitmap)
-            canvas.drawColor(Color.WHITE)
 
             var dxRe = resolution / sizeSetRe
             var dyIm = resolution / sizeSetIm
@@ -152,7 +155,7 @@ class FractalTask(
             val x0Re = offsetRe / sizeSetRe + RE_MIN / zoom
             val y0Im = offsetIm / sizeSetIm + IM_MIN / zoom
 
-            plotMandelbrot(canvas, 0f, 0f, resF, resF, x0Re, y0Im, density)
+            plotJulia(canvas, 0f, 0f, resF, resF, x0Re, y0Im, cRe, cIm, density)
 
             var x1: Float
             var y1: Float
@@ -176,9 +179,9 @@ class FractalTask(
                     x2Re = x1Re + dxRe
 
                     do {
-                        plotMandelbrot(canvas, x1, y2, resF, resF, x1Re, y2Im, density)
-                        plotMandelbrot(canvas, x2, y1, resF, resF, x2Re, y1Im, density)
-                        plotMandelbrot(canvas, x2, y2, resF, resF, x2Re, y2Im, density)
+                        plotJulia(canvas, x1, y2, resF, resF, x1Re, y2Im, cRe, cIm, density)
+                        plotJulia(canvas, x2, y1, resF, resF, x2Re, y1Im, cRe, cIm, density)
+                        plotJulia(canvas, x2, y2, resF, resF, x2Re, y2Im, cRe, cIm, density)
 
                         x1 += resolution2
                         x2 += resolution2
@@ -216,58 +219,72 @@ class FractalTask(
         }
 
         /**
-         * Plot a Mandelbrot point.
+         * Plot a Julia point.
          * <br/>
          * `z := z * z + c`
          * <br/>
          * http://en.wikipedia.org/wiki/Mandelbrot_set
+         * https://en.wikipedia.org/wiki/Julia_set
          */
-        private fun plotMandelbrot(
+        private fun plotJulia(
             canvas: Canvas,
             x1: Float,
             y1: Float,
             w: Float,
             h: Float,
-            kRe: Double,
-            kIm: Double,
+            z0Re: Double,
+            z0Im: Double,
+            cRe: Double?,
+            cIm: Double?,
             density: Double
         ) {
-            var zRe = 0.0
-            var zIm = 0.0
-            var zReSrq = 0.0
-            var zImSrq = 0.0
-            var d: Double
-            var r: Double
+            var zRe = z0Re
+            var zIm = z0Im
+            val cRe = cRe ?: z0Re
+            val cIm = cIm ?: z0Im
+            var aRe: Double
+            var aIm: Double
+            var zReSrq = zRe * zRe
+            var zImSrq = zIm * zIm
+            var zHypot: Double
             var i = 0
             var underflow: Boolean
 
+            // Complex times:
+            //   double real = a.re * b.re - a.im * b.im;
+            //   double imag = a.re * b.im + a.im * b.re;
+            // z = a = b
+            // z.re = (z.re * z.re) - (z.im * z.im)
+            // z.im = a.re * b.im + a.im * b.re = a.re * a.im + a.im * a.re = a.re * a.im * 2
+
             do {
-                r = zReSrq - zImSrq + kRe
-                zIm = 2.0 * zRe * zIm + kIm
-                zRe = r
+                aRe = zRe
+                aIm = zIm
+                zRe = (zReSrq - zImSrq) + cRe
+                zIm = (aRe * aIm * 2) + cIm
+
                 zReSrq = zRe * zRe
                 zImSrq = zIm * zIm
-                d = zReSrq + zImSrq
+                zHypot = zReSrq + zImSrq
                 i++
                 underflow = i < OVERFLOW
-            } while (underflow && d < 9)
+            } while (underflow && zHypot < 9)
 
-            var z = i.toDouble()
-            if (underflow) {
-                z += LOG2_LOG2_2 - ln(ln(d)) / LOG2
+            val d = if (underflow) {
+                i.toDouble() + LOG2_LOG2_2 - ln(ln(zHypot)) / LOG2
             } else {
-                z = 0.0
+                0.0
             }
 
-            paint.color = mapColor(z, density)
+            paint.color = mapColor(d, density)
             canvas.drawRect(x1, y1, x1 + w, y1 + h, paint)
         }
 
-        private fun mapColor(z: Double, density: Double): Int {
-            if (z == 0.0) {
+        private fun mapColor(d: Double, density: Double): Int {
+            if (d == 0.0) {
                 return Color.BLACK
             }
-            hsv[0] = ((z * density) % hues).toFloat()
+            hsv[0] = ((d * density) % hues).toFloat()
             return Color.HSVToColor(hsv)
         }
 
@@ -292,7 +309,7 @@ class FractalTask(
             private val LOG2 = ln(2.0)
             private val LOG2_LOG2 = ln(LOG2) / LOG2
             private val LOG2_LOG2_2 = 2.0 + LOG2_LOG2
-            private const val OVERFLOW = 300
+            private const val OVERFLOW = 200
         }
     }
 

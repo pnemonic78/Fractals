@@ -11,4 +11,5 @@
 
     <!-- Menu. -->
     <string name="menu_fullscreen">全画面表示</string>
+    <string name="menu_mode">モード</string>
 </resources>

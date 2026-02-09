@@ -56,6 +56,8 @@ class WallpaperView(
     private var task: Job? = null
     private var listener: WallpaperListener? = null
     private val gestureDetector: GestureDetector = GestureDetector(context, this)
+    private var paramCReal: Double? = null
+    private var paramCImaginary: Double? = null
 
     /**
      * The matrix for the bitmap.
@@ -78,7 +80,7 @@ class WallpaperView(
     override fun start(delay: Long) {
         if (isIdle()) {
             task = lifecycleScope.launch(Dispatchers.Default) {
-                FractalTask(bitmap!!, bitmapMatrix).apply {
+                FractalTask(bitmap!!, bitmapMatrix, paramCReal, paramCImaginary).apply {
                     saturation = 0.5f
                     brightness = 0.5f
                     startDelay = delay
@@ -214,4 +216,8 @@ class WallpaperView(
         bitmap = null
     }
 
+    fun setJulia(cRe: Double? = null, cIm: Double? = null) {
+        paramCReal = cRe
+        paramCImaginary = cIm
+    }
 }

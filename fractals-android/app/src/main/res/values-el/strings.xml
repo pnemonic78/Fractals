@@ -11,4 +11,5 @@
 
     <!-- Menu. -->
     <string name="menu_fullscreen">Πληρησ οθονη</string>
+    <string name="menu_mode">Λειτουργία</string>
 </resources>

@@ -114,6 +114,16 @@ class FractalsWallpaperService : WallpaperService(), LifecycleOwner {
             val matrix = mainView.bitmapMatrix
             matrix.preTranslate(x, y)
             matrix.postScale(z, z)
+
+            var cRe: Double? = null
+            var cIm: Double? = null
+            val mode = random.nextBoolean()
+            if (mode) {
+                cRe = random.nextDouble(-1.0, 1.0)
+                cIm = random.nextDouble(-1.0, 1.0)
+            }
+            mainView.setJulia(cRe, cIm)
+
             mainView.restart(delay)
         }
 
@@ -168,6 +178,6 @@ class FractalsWallpaperService : WallpaperService(), LifecycleOwner {
         /**
          * Enough time for user to admire the wallpaper before starting the next rendition.
          */
-        private const val DELAY = 10L * DateUtils.SECOND_IN_MILLIS
+        private const val DELAY = 15 * DateUtils.SECOND_IN_MILLIS
     }
 }

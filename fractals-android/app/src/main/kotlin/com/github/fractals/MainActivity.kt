@@ -22,11 +22,14 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.ViewGroup
+import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
@@ -42,14 +45,53 @@ import timber.log.Timber
 class MainActivity : ComponentActivity(), FractalsListener {
 
     private lateinit var mainView: FractalsView
+    private lateinit var paramsView: ViewGroup
+    private lateinit var paramCRealBar: SeekBar
+    private lateinit var paramCImaginaryBar: SeekBar
     private var menuStop: MenuItem? = null
     private var menuShare: MenuItem? = null
+    private var mode = MODE_MANDELBROT
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         mainView = findViewById(R.id.fractals)
         mainView.setFractalsListener(this)
+
+        paramsView = findViewById(R.id.fractal_params)
+        paramsView.isVisible = mode == MODE_JULIA
+
+        paramCRealBar = findViewById<SeekBar>(R.id.fractal_param_c_re)
+        paramCRealBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) =
+                Unit
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) = Unit
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                // [0, 100] -> [-1.0, +1.0]
+                val c = 2.0 * ((seekBar.progress / seekBar.max.toDouble()) - 0.5)
+                stop()
+                mainView.setJuliaReal(c)
+                start()
+            }
+        })
+
+        paramCImaginaryBar = findViewById<SeekBar>(R.id.fractal_param_c_im)
+        paramCImaginaryBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) =
+                Unit
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) = Unit
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                // [0, 100] -> [-1.0, +1.0]
+                val c = 2.0 * ((seekBar.progress / seekBar.max.toDouble()) - 0.5)
+                stop()
+                mainView.setJuliaImaginary(c)
+                start()
+            }
+        })
     }
 
     override fun onDestroy() {
@@ -76,7 +118,7 @@ class MainActivity : ComponentActivity(), FractalsListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_stop -> {
-                stop()
+                stop(clear = true)
                 return true
             }
 
@@ -86,6 +128,11 @@ class MainActivity : ComponentActivity(), FractalsListener {
                 } else {
                     showNormalScreen()
                 }
+                return true
+            }
+
+            R.id.menu_mode -> {
+                toggleMode()
                 return true
             }
 
@@ -199,10 +246,12 @@ class MainActivity : ComponentActivity(), FractalsListener {
         super.onBackPressed()
     }
 
-    private fun stop() {
+    private fun stop(clear: Boolean = false) {
         menuStop?.isVisible = false
         mainView.stop()
-        mainView.clear()
+        if (clear) {
+            mainView.clear()
+        }
     }
 
     private fun start() {
@@ -227,5 +276,27 @@ class MainActivity : ComponentActivity(), FractalsListener {
         Timber.e(error)
         Toast.makeText(context, R.string.share_failed, Toast.LENGTH_LONG).show()
         menuItem.isEnabled = true
+    }
+
+    private fun toggleMode() {
+        stop(clear = true)
+
+        mode = 1 - mode
+        if (mode == MODE_JULIA) {
+            paramsView.isVisible = true
+            paramCRealBar.progress = 50
+            paramCImaginaryBar.progress = 50
+            mainView.setJulia(0.0, 0.0)
+        } else {
+            paramsView.isVisible = false
+            mainView.setJulia(null, null)
+        }
+
+        start()
+    }
+
+    companion object {
+        private const val MODE_MANDELBROT = 0
+        private const val MODE_JULIA = 1
     }
 }

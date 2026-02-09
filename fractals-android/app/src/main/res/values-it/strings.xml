@@ -11,4 +11,5 @@
 
     <!-- Menu. -->
     <string name="menu_fullscreen">A schermo intero</string>
+    <string name="menu_mode">Modalità</string>
 </resources>

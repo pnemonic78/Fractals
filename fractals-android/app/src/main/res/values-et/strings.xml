@@ -11,4 +11,5 @@
 
     <!-- Menu. -->
     <string name="menu_fullscreen">Täisekraan</string>
+    <string name="menu_mode">Moodus</string>
 </resources>

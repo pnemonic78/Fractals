@@ -11,4 +11,5 @@
 
     <!-- Menu. -->
     <string name="menu_fullscreen">Цял екран</string>
+    <string name="menu_mode">Режим</string>
 </resources>
