@@ -29,6 +29,7 @@ import com.github.fractals.FractalTask
 import com.github.fractals.Fractals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onCompletion
@@ -70,7 +71,7 @@ class WallpaperView(
 
     fun isIdle(): Boolean {
         val job = task ?: return true
-        return job.isCancelled || job.isCompleted || !job.isActive
+        return job.isCancelled || job.isCompleted
     }
 
     override fun clear() {
@@ -79,17 +80,34 @@ class WallpaperView(
 
     override fun start(delay: Long) {
         if (isIdle()) {
+            val bitmap = bitmap ?: return
+
             task = lifecycleScope.launch(Dispatchers.Default) {
-                FractalTask(bitmap!!, bitmapMatrix, paramCReal, paramCImaginary).apply {
+                FractalTask(bitmap, bitmapMatrix, paramCReal, paramCImaginary).apply {
                     saturation = 0.5f
                     brightness = 0.5f
                     startDelay = delay
                 }
                     .flowOn(Dispatchers.Default)
-                    .onStart { onTaskStart() }
-                    .onCompletion { onTaskComplete() }
+                    .onStart {
+                        val job = currentCoroutineContext()[Job]
+                        if (job === task) {
+                            onTaskStart()
+                        }
+                    }
+                    .onCompletion {
+                        val job = currentCoroutineContext()[Job]
+                        if (job === task) {
+                            onTaskComplete()
+                        }
+                    }
                     .catch { onTaskError(it) }
-                    .collect { onTaskNext(it) }
+                    .collect {
+                        val job = currentCoroutineContext()[Job]
+                        if (job === task) {
+                            onTaskNext(it)
+                        }
+                    }
             }
         }
     }

@@ -290,7 +290,7 @@ class FractalTask(
 
         suspend fun isDisposed(): Boolean {
             val job = currentCoroutineContext()[Job] ?: return true
-            return job.isCancelled || job.isCompleted || !job.isActive
+            return job.isCancelled || job.isCompleted
         }
 
         suspend fun dispose() {

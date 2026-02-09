@@ -30,6 +30,7 @@ import android.view.View
 import androidx.core.graphics.createBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onCompletion
@@ -128,10 +129,25 @@ class FractalsView : View,
                     startDelay = delay
                 }
                     .flowOn(Dispatchers.Default)
-                    .onStart { onTaskStart() }
-                    .onCompletion { onTaskComplete() }
+                    .onStart {
+                        val job = currentCoroutineContext()[Job]
+                        if (job === task) {
+                            onTaskStart()
+                        }
+                    }
+                    .onCompletion {
+                        val job = currentCoroutineContext()[Job]
+                        if (job === task) {
+                            onTaskComplete()
+                        }
+                    }
                     .catch { onTaskError(it) }
-                    .collect { onTaskNext(it) }
+                    .collect {
+                        val job = currentCoroutineContext()[Job]
+                        if (job === task) {
+                            onTaskNext(it)
+                        }
+                    }
             }
         }
     }
@@ -186,7 +202,7 @@ class FractalsView : View,
      */
     fun isIdle(): Boolean {
         val job = task ?: return true
-        return job.isCancelled || job.isCompleted || !job.isActive
+        return job.isCancelled || job.isCompleted
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
